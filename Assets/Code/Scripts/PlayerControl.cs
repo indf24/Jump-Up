@@ -5,12 +5,8 @@ public class PlayerControl : MonoBehaviour
 {
     private Rigidbody2D player;
 
-    private bool isDragging = false;
     private Vector2 startTouchPosition;
     private Vector2 endTouchPosition;
-
-    [SerializeField] private bool platformContact;
-    [SerializeField] private bool platformTriggerContact;
 
     private void Awake()
     {
@@ -25,11 +21,6 @@ public class PlayerControl : MonoBehaviour
             JumpForceStart(touch);
             JumpForceEnd(touch);
         }
-
-        if (platformContact && platformTriggerContact && player.velocity != Vector2.zero)
-        {
-            StopMovement();
-        }
     }
 
     private void JumpForceStart(Touch touch)
@@ -37,8 +28,6 @@ public class PlayerControl : MonoBehaviour
         // Handle touch begin
         if (touch.phase == TouchPhase.Began)
         {
-            isDragging = true;
-
             // Get the touch position
             startTouchPosition = touch.position;
         }
@@ -50,7 +39,6 @@ public class PlayerControl : MonoBehaviour
         if (touch.phase is TouchPhase.Ended)
         {
             // Get the vector direction and force
-            isDragging = false;
             endTouchPosition = touch.position;
             Vector2 dragVector = startTouchPosition - endTouchPosition;
             (Vector2 jumpDirection, float jumpForce) = (dragVector.normalized, dragVector.magnitude);
@@ -67,46 +55,5 @@ public class PlayerControl : MonoBehaviour
     {
         // Apply the force to the ball
         player.AddForce(jumpDirection * Math.Clamp(jumpForce, 0, 800), ForceMode2D.Impulse);
-    }
-
-    private void StopMovement()
-    {
-        // Stop the ball
-        player.constraints = RigidbodyConstraints2D.FreezeRotation;
-        player.velocity = Vector2.zero;
-        player.constraints = RigidbodyConstraints2D.None;
-        platformContact = false;
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        if (collision.collider.tag is "Platform")
-        {
-            platformContact = true;
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.collider.tag is "Platform")
-        {
-            platformContact = false;
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.tag is "Platform")
-        {
-            platformTriggerContact = true;
-        }
-    }
-
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.tag is "Platform")
-        {
-            platformTriggerContact = false;
-        }
     }
 }

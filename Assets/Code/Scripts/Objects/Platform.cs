@@ -2,7 +2,10 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
-    private float currentXPos = 0;
+    private float currentYPos;
+    private float defaultYPos = 3.5f;
+
+    private float currentXPos = 0f;
     private char spawnSide;
     private float nextPlatformOffset = 1.5f;
 
@@ -48,6 +51,7 @@ public class Platform : MonoBehaviour
 
         // Next platform y axis spawn
         ySpawnPos = Random.Range(ySpawnPosMin, ySpawnPosMax);
+        currentYPos = ySpawnPos;
 
         return new Vector2(xSpawnPos, ySpawnPos);
     }
@@ -56,5 +60,11 @@ public class Platform : MonoBehaviour
     {
         // Deactivates the obstacle
         gameObject.SetActive(false);
+    }
+
+    public void Move()
+    {
+        float yMove = currentYPos - defaultYPos;
+        gameObject.transform.Translate(Vector2.down * yMove * Time.deltaTime);
     }
 }

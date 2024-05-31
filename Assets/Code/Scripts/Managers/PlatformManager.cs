@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,15 +8,11 @@ public class PlatformManager : MonoBehaviour
     private int poolSize = 2;
     private Queue<Platform> platformPool = new();
     Platform platform;
+    Animator animator;
 
     private void Awake()
     {
         CreatePool();
-    }
-
-    void Update()
-    {
-        platform.Move();
     }
 
     private void CreatePool()
@@ -41,11 +38,17 @@ public class PlatformManager : MonoBehaviour
             platform = obj.GetComponent<Platform>();
         }
 
+        animator = platform.GetComponent<Animator>();
         platform.Spawn();
     }
 
-    public void DespawnPlatform()
+    public IEnumerator DespawnPlatform()
     {
+        Platform platform = this.platform;
+
+        animator.SetTrigger("Despawn");
+        yield return new WaitForSeconds(0.2f);
         platform.Despawn();
+        platformPool.Enqueue(platform);
     }
 }

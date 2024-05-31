@@ -58,7 +58,7 @@ public class Platform : MonoBehaviour
 
     public void Despawn()
     {
-        // Deactivates the obstacle
+        // Deactivates the platform
         gameObject.SetActive(false);
     }
 

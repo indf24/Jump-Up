@@ -9,11 +9,6 @@ public class PlayerManager : MonoBehaviour
         player = GetComponent<Rigidbody2D>();
     }
 
-    private void Update()
-    {
-        
-    }
-
     private void StopMovement()
     {
         // Stop the ball

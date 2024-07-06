@@ -2,9 +2,13 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+    [SerializeField] private PlatformManager platformManager;
+
     private Rigidbody2D player;
 
-    private void Awake()
+    public bool canJump = true;
+
+    private void Start()
     {
         player = GetComponent<Rigidbody2D>();
     }
@@ -12,9 +16,8 @@ public class PlayerManager : MonoBehaviour
     private void StopMovement()
     {
         // Stop the ball
-        player.constraints = RigidbodyConstraints2D.FreezeRotation;
+        player.constraints = RigidbodyConstraints2D.FreezePositionX;
         player.velocity = Vector2.zero;
-        player.constraints = RigidbodyConstraints2D.None;
     }
 
     private bool IsGrounded()
@@ -31,6 +34,7 @@ public class PlayerManager : MonoBehaviour
         if (IsGrounded())
         {
             StopMovement();
+            StartCoroutine(platformManager.MovePlatform());
         }
     }
 }

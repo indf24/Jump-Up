@@ -2,19 +2,16 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
-    private float currentYPos;
-    private float defaultYPos = 3.5f;
-
     private float currentXPos = 0f;
     private char spawnSide;
-    private float nextPlatformOffset = 1.5f;
+    private float nextPlatformOffset = 2f;
 
     private float xSpawnPos;
     private float xSpawnPosRange = 4f;
 
     private float ySpawnPos;
     private float ySpawnPosMin = 8f;
-    private float ySpawnPosMax = 16f;
+    private float ySpawnPosMax = 15f;
 
     public void Spawn()
     {
@@ -51,7 +48,6 @@ public class Platform : MonoBehaviour
 
         // Next platform y axis spawn
         ySpawnPos = Random.Range(ySpawnPosMin, ySpawnPosMax);
-        currentYPos = ySpawnPos;
 
         return new Vector2(xSpawnPos, ySpawnPos);
     }
@@ -62,9 +58,8 @@ public class Platform : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void Move()
+    public void Move(float moveDistance)
     {
-        float yMove = currentYPos - defaultYPos;
-        gameObject.transform.Translate(Vector2.down * yMove * Time.deltaTime);
+        gameObject.transform.Translate(Vector2.down * moveDistance);
     }
 }

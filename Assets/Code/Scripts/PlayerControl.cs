@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
@@ -8,10 +9,15 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private PlatformManager platformManager;
 
     private Rigidbody2D player;
+    [SerializeField] private GameObject trajectoryDot;
 
     private Vector2 startTouchPosition;
     private Vector2 endTouchPosition;
-    Vector2 jumpVector;
+
+    float minJumpForce = 0f;
+    float maxJumpForce = 800f;
+
+    Vector2 currentJumpVector;
 
     private bool isTouching;
 
@@ -28,19 +34,24 @@ public class PlayerControl : MonoBehaviour
         if (Input.touchCount > 0 && playerManager.canJump)
         {
             Touch touch = Input.GetTouch(0);
-            jumpVector = JumpCalculations(touch);
-            CalculateTrajectory(touch);
+            Vector2 jumpVector = CalculateJump(touch);
+            if (jumpVector != currentJumpVector)
+            {
+                jumpVector = LimitJumpForce(jumpVector, minJumpForce, maxJumpForce);
+                CalculateTrajectory(touch, jumpVector);
+                currentJumpVector = jumpVector;
+            }
 
             if (jumpVector.magnitude > 0 && !isTouching)
             {
-                Jump(jumpVector);
+                Jump(jumpVector, minJumpForce, maxJumpForce);
                 playerManager.canJump = false;
                 StartCoroutine(platformManager.DespawnPlatform());
             }
         }
     }
 
-    private Vector2 JumpCalculations(Touch touch)
+    private Vector2 CalculateJump(Touch touch)
     {
         // Handle touch begin
         if (touch.phase is TouchPhase.Began)
@@ -61,33 +72,35 @@ public class PlayerControl : MonoBehaviour
                 isTouching = false;
             }
 
-            return jumpVector.normalized;
+            return jumpVector;
         }
 
         return Vector2.zero;
     }
 
-    private void Jump(Vector2 jumpDirection)
+    private Vector2 LimitJumpForce(Vector2 jumpVector, float minJumpForce, float maxJumpForce)
     {
-        float minJumpForce = 0f;
-        float maxJumpForce = 800f;
-        // Apply the force to the ball
-        //player.AddForce(jumpDirection * 800f, ForceMode2D.Impulse);
+        return jumpVector.normalized * Mathf.Clamp(jumpVector.magnitude, minJumpForce, maxJumpForce);
     }
 
-    private void CalculateTrajectory(Touch touch)
+    private void Jump(Vector2 jumpVector, float minJumpForce, float maxJumpForce)
+    {
+        // Apply the force to the ball
+        player.AddForce(jumpVector, ForceMode2D.Impulse);
+    }
+
+    private void CalculateTrajectory(Touch touch, Vector2 jumpVector)
     {
         if (touch.phase is TouchPhase.Moved or TouchPhase.Stationary)
         {
             trajectoryRenderer.enabled = true;
+            List<Vector2> trajectory = Plot(player, (Vector2)transform.position, jumpVector, 1000);
 
-            //Vector2[] trajectory = Plot(player, (Vector2)transform.position, jumpVector.normalized * 800f, 1000);
+            trajectoryRenderer.positionCount = trajectory.Count;
 
-            trajectoryRenderer.positionCount = trajectory.Length;
+            Vector3[] positions = new Vector3[trajectory.Count];
 
-            Vector3[] positions = new Vector3[trajectory.Length];
-
-            for (int i = 0; i < trajectory.Length; i++)
+            for (int i = 0; i < trajectory.Count; i++)
             {
                 positions[i] = trajectory[i];
             }
@@ -96,28 +109,46 @@ public class PlayerControl : MonoBehaviour
         }
         else
         {
-            //trajectoryRenderer.enabled = false;
+            trajectoryRenderer.enabled = false;
         }
     }
 
-    public Vector2[] Plot(Rigidbody2D rigidbody, Vector2 pos, Vector2 dragVector, int steps)
+    public List<Vector2> Plot(Rigidbody2D rigidbody, Vector2 pos, Vector2 dragVector, int steps)
     {
-        Vector2[] results = new Vector2[steps];
+        GameObject trajectory = GameObject.Find("Trajectory");
+
+        for(int i = 0; i < trajectory.transform.childCount; i++)
+        {
+            Destroy(trajectory.transform.GetChild(i).gameObject);
+        }
+
+        List<Vector2> results = new();
 
         float timestep = Time.fixedDeltaTime / Physics2D.velocityIterations;
         Vector2 gravityAccel = rigidbody.gravityScale * timestep * timestep * Physics2D.gravity;
 
         float drag = 1f - (timestep * rigidbody.drag);
-        Vector2 moveStep = dragVector * timestep;
+        Vector2 moveStep = dragVector / rigidbody.mass * timestep;
 
         for (int i = 0; i < steps; i++)
         {
             moveStep += gravityAccel;
             moveStep *= drag;
             pos += moveStep;
-            results[i] = pos;
+
+            results.Add(pos);
         }
 
-        return results;
+        int sampleRate = 10; // Sample every 5th point (adjust as needed)
+        List<Vector2> sampledResults = new();
+
+        for (int i = 0; i < results.Count; i += sampleRate)
+        {
+            GameObject dot = Instantiate(trajectoryDot, results[i], Quaternion.identity);
+            dot.transform.parent = GameObject.Find("Trajectory").transform;
+            sampledResults.Add(results[i]);
+        }
+
+        return sampledResults;
     }
 }

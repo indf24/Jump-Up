@@ -13,21 +13,21 @@ public class Platform : MonoBehaviour
     private float ySpawnPosMin = 8f;
     private float ySpawnPosMax = 15f;
 
-    public void Spawn()
+    public void Spawn(float playerXPosition)
     {
         // Activate the next platform at a random position
-        gameObject.transform.position = SpawnPosition();
+        gameObject.transform.position = SpawnPosition(playerXPosition);
         gameObject.SetActive(true);
     }
 
-    private Vector2 SpawnPosition()
+    private Vector2 SpawnPosition(float playerXPosition)
     {
         // Spawn side selection regarding the platform where the ball is
-        if (currentXPos + nextPlatformOffset > xSpawnPosRange)
+        if (playerXPosition + nextPlatformOffset > xSpawnPosRange)
         {
             spawnSide = 'l';
         }
-        else if (currentXPos - nextPlatformOffset < -xSpawnPosRange)
+        else if (playerXPosition - nextPlatformOffset < -xSpawnPosRange)
         {
             spawnSide = 'r';
         }
@@ -39,11 +39,11 @@ public class Platform : MonoBehaviour
         // Next platform x axis spawn
         if (spawnSide == 'l')
         {
-            xSpawnPos = Random.Range(-xSpawnPosRange, currentXPos - nextPlatformOffset);
+            xSpawnPos = Random.Range(-xSpawnPosRange, playerXPosition - nextPlatformOffset);
         }
         else
         {
-            xSpawnPos = Random.Range(currentXPos + nextPlatformOffset, xSpawnPosRange);
+            xSpawnPos = Random.Range(playerXPosition + nextPlatformOffset, xSpawnPosRange);
         }
 
         // Next platform y axis spawn

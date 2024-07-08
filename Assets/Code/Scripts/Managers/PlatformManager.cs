@@ -1,6 +1,6 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlatformManager : MonoBehaviour
@@ -8,6 +8,7 @@ public class PlatformManager : MonoBehaviour
     [SerializeField] private PlayerManager playerManager;
 
     private GameObject player;
+
     [SerializeField] private GameObject platformPrefab;
     private int poolSize = 2;
     private Queue<Platform> platformPool = new();
@@ -42,7 +43,7 @@ public class PlatformManager : MonoBehaviour
 
     public void SpawnPlatform()
     {
-        if (platformPool.Count > 0)
+        if (platformPool.Any())
         {
             nextPlatform = platformPool.Dequeue();
         }
@@ -52,7 +53,7 @@ public class PlatformManager : MonoBehaviour
             nextPlatform = obj.GetComponent<Platform>();
         }
 
-        nextPlatform.Spawn();
+        nextPlatform.Spawn(player.transform.position.x);
     }
 
     public IEnumerator MovePlatform()

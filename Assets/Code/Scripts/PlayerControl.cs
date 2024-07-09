@@ -11,15 +11,16 @@ public class PlayerControl : MonoBehaviour
 
     private Rigidbody2D player;
 
+    Touch touch = new();
+    Vector2 jumpVector = new();
+
     private Vector2 startTouchPosition;
     private Vector2 endTouchPosition;
 
-    float minJumpForce = 0f;
-    float maxJumpForce = 800f;
+    private float minJumpForce = 100f;
+    private float maxJumpForce = 800f;
 
-    Vector2 currentJumpVector;
-
-    private bool isTouching;
+    private int trajectorySteps = 1000;
 
     private void Start()
     {
@@ -28,25 +29,33 @@ public class PlayerControl : MonoBehaviour
 
     void Update()
     {
-        if (Input.touchCount > 0 && playerManager.canJump)
+        if (playerManager.canJump)
         {
-            Touch touch = Input.GetTouch(0);
-            Vector2 jumpVector = CalculateJump(touch);
-
-            if (jumpVector != currentJumpVector)
+            if (Input.touchCount > 0)
             {
-                jumpVector = LimitJumpForce(jumpVector, minJumpForce, maxJumpForce);
-                trajectoryManager.CalculateTrajectory(touch, player, jumpVector);
-                currentJumpVector = jumpVector;
+                touch = Input.GetTouch(0);
+                jumpVector = CalculateJump(touch);
             }
 
-            if (jumpVector.magnitude > 0 && !isTouching)
+            if (jumpVector.magnitude > minJumpForce)
             {
-                Jump(jumpVector, minJumpForce, maxJumpForce);
-                playerManager.canJump = false;
-                trajectoryManager.DespawnDots();
-                StartCoroutine(platformManager.DespawnPlatform());
-            }
+                if (touch.phase is TouchPhase.Moved)
+                {
+                    jumpVector = LimitJumpForce(jumpVector, minJumpForce, maxJumpForce);
+                    trajectoryManager.MakeTrajectory(touch, player, jumpVector, trajectorySteps);
+                }
+
+                if (touch.phase is TouchPhase.Ended)
+                {
+                    trajectoryManager.DespawnDots();
+                    jumpVector = LimitJumpForce(jumpVector, minJumpForce, maxJumpForce);
+                    Jump(jumpVector, minJumpForce, maxJumpForce);
+                    playerManager.canJump = false;
+                    StartCoroutine(playerManager.NotGrounded());
+                    StartCoroutine(platformManager.DespawnPlatform());
+                    jumpVector = new();
+                }
+            } 
         }
     }
 
@@ -55,21 +64,15 @@ public class PlayerControl : MonoBehaviour
         // Handle touch begin
         if (touch.phase is TouchPhase.Began)
         {
-            isTouching = true;
             // Get the touch position
             startTouchPosition = touch.position;
         }
 
-        if (isTouching)
+        if (touch.phase is TouchPhase.Moved or TouchPhase.Ended)
         {
             // Get the vector direction and force  
             endTouchPosition = touch.position;
             Vector2 jumpVector = startTouchPosition - endTouchPosition;
-
-            if (touch.phase is TouchPhase.Ended)
-            {
-                isTouching = false;
-            }
 
             return jumpVector;
         }

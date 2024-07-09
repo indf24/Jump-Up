@@ -1,40 +1,63 @@
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerManager : MonoBehaviour
 {
     [SerializeField] private PlatformManager platformManager;
+    [SerializeField] private ScoreManager scoreManager;
 
-    private Rigidbody2D player;
+    private Rigidbody2D playerRb;
+    private Collider2D playerCollider;
 
     public bool canJump = true;
+    public bool alreadyGrounded = false;
+
+    private RaycastHit2D hit;
 
     private void Start()
     {
-        player = GetComponent<Rigidbody2D>();
+        GameObject player = GameObject.Find("Player");
+        playerRb = player.GetComponent<Rigidbody2D>();
+        playerCollider = player.GetComponent<CircleCollider2D>();
+    }
+
+    private void Update()
+    {
+        if (IsGrounded() && !alreadyGrounded)
+        {
+            StopMovement();
+            alreadyGrounded = true;
+            scoreManager.AddPoints(1);
+            StartCoroutine(platformManager.MovePlatform());
+        }
     }
 
     private void StopMovement()
     {
         // Stop the ball
-        player.constraints = RigidbodyConstraints2D.FreezePositionX;
-        player.velocity = Vector2.zero;
+        playerRb.constraints = RigidbodyConstraints2D.FreezePositionX;
+        playerRb.velocity = Vector2.zero;
     }
 
     private bool IsGrounded()
     {
-        // Check if the player is touching the top of the platform
-        Vector2 rayOrigin = player.position - new Vector2(0, (player.GetComponent<Collider2D>().bounds.size.y / 2) + 0.002f);
-        float rayDistance = 0.03f;
-        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, rayDistance);
+        // Check if the player is touching the top of the platform  
+        CreateGroudedRay();
         return hit.collider != null && hit.collider.CompareTag("Platform");
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void CreateGroudedRay()
     {
-        if (IsGrounded())
-        {
-            StopMovement();
-            StartCoroutine(platformManager.MovePlatform());
-        }
+        Vector2 rayOrigin = playerRb.position - new Vector2(0, (playerCollider.bounds.size.y / 2) + 0.002f);
+        float rayDistance = 0.03f;
+        hit = Physics2D.Raycast(rayOrigin, Vector2.down, rayDistance);
+    }
+
+    public IEnumerator NotGrounded()
+    {
+        yield return new WaitForSeconds(0.2f);
+        alreadyGrounded = false;
     }
 }

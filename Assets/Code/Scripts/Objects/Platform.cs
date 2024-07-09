@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
-    private float currentXPos = 0f;
     private char spawnSide;
     private float nextPlatformOffset = 2f;
 

@@ -16,11 +16,6 @@ public class TrajectoryManager : MonoBehaviour
         CreatePool();
     }
 
-    void Start()
-    {
-        trajectoryRenderer = GetComponent<LineRenderer>();
-    }
-
     private void CreatePool()
     {
         for (int i = 0; i < poolSize; i++)
@@ -32,62 +27,47 @@ public class TrajectoryManager : MonoBehaviour
         }
     }
 
-    public void CalculateTrajectory(Touch touch, Rigidbody2D rigidbody, Vector2 jumpVector)
+    public void MakeTrajectory(Touch touch, Rigidbody2D rigidbody, Vector2 jumpVector, int steps)
     {
-        if (touch.phase is TouchPhase.Moved or TouchPhase.Stationary)
-        {
-            trajectoryRenderer.enabled = true;
-            List<Vector2> trajectory = Plot(rigidbody, (Vector2)rigidbody.transform.position, jumpVector, 1000);
-
-            trajectoryRenderer.positionCount = trajectory.Count;
-
-            Vector3[] positions = new Vector3[trajectory.Count];
-
-            for (int i = 0; i < trajectory.Count; i++)
-            {
-                positions[i] = trajectory[i];
-            }
-
-            trajectoryRenderer.SetPositions(positions);
-        }
-        else if (touch.phase is TouchPhase.Ended or TouchPhase.Canceled)
+        if (touch.phase is TouchPhase.Moved)
         {
             DespawnDots();
+            List<Vector2> trajectoryPoints = CalculateTrajectory(rigidbody, (Vector2)rigidbody.transform.position, jumpVector, steps);
+            DrawTrajectory(trajectoryPoints);
         }
     }
 
-    private List<Vector2> Plot(Rigidbody2D rigidbody, Vector2 pos, Vector2 dragVector, int steps)
+    private List<Vector2> CalculateTrajectory(Rigidbody2D rigidbody, Vector2 pos, Vector2 dragVector, int steps)
     {
-        DespawnDots();
-
-        List<Vector2> results = new();
+        List<Vector2> points = new();
 
         float timestep = Time.fixedDeltaTime / Physics2D.velocityIterations;
-        Vector2 gravityAccel = rigidbody.gravityScale * timestep * timestep * Physics2D.gravity;
+        Vector2 gravityAcceleration = rigidbody.gravityScale * timestep * timestep * Physics2D.gravity;
 
         float drag = 1f - (timestep * rigidbody.drag);
         Vector2 moveStep = dragVector / rigidbody.mass * timestep;
 
         for (int i = 0; i < steps; i++)
         {
-            moveStep += gravityAccel;
+            moveStep += gravityAcceleration;
             moveStep *= drag;
             pos += moveStep;
 
-            results.Add(pos);
+            points.Add(pos);
         }
 
-        int sampleRate = 10; // Sample every 5th point
-        List<Vector2> sampledResults = new();
+        return points;
+    }
 
-        for (int i = 0; i < results.Count; i += sampleRate)
+    private void DrawTrajectory(List<Vector2> trajectoryPoints)
+    {
+        int sampleRate = 10;
+
+        for (int i = 0; i < trajectoryPoints.Count; i += sampleRate)
         {
-            TrajectoryDot dot = SpawnDot(results[i]);
+            TrajectoryDot dot = SpawnDot(trajectoryPoints[i]);
             dot.transform.parent = transform;
-            sampledResults.Add(results[i]);
         }
-
-        return sampledResults;
     }
 
     private TrajectoryDot SpawnDot(Vector2 spawnPosition)

@@ -59,7 +59,6 @@ public class PlatformManager : MonoBehaviour
     public IEnumerator MovePlatform()
     {
         currentPlatform = nextPlatform; //Designate the platform where the player is as the current one
-        animator = currentPlatform.GetComponent<Animator>(); //Get the current platforms animator
 
         player.transform.parent = currentPlatform.transform; //Make the player a child object of the current platform to move together
 
@@ -96,6 +95,7 @@ public class PlatformManager : MonoBehaviour
         }
         else
         {
+            animator = currentPlatform.GetComponent<Animator>(); //Get the current platforms animator
             // Play despawn animation and despawn the platform
             animator.SetTrigger("Despawn");
             yield return new WaitForSeconds(0.2f);

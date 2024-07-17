@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class GameOverManager : MonoBehaviour
 {
     [SerializeField] private SceneControl sceneControl;
+    [SerializeField] private ScoreManager scoreManager;
 
     [SerializeField] private GameObject gameOverButtons;
     [SerializeField] private Button retryButton;
@@ -12,8 +13,6 @@ public class GameOverManager : MonoBehaviour
     private void Start()
     {
         //gameOverButtons = GameObject.Find("GameOverButtons");
-        retryButton.onClick.AddListener(Restart);
-        menuButton.onClick.AddListener(GoToMenu);
     }
 
     private void Restart()
@@ -23,11 +22,14 @@ public class GameOverManager : MonoBehaviour
 
     private void GoToMenu()
     {
-
+        sceneControl.LoadScene("MainMenu");
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         gameOverButtons.SetActive(true);
+        retryButton.onClick.AddListener(Restart);
+        menuButton.onClick.AddListener(GoToMenu);
+        scoreManager.UpdateHighScore();
     }
 }

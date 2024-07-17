@@ -18,15 +18,11 @@ public class PlatformManager : MonoBehaviour
 
     private Animator animator;
 
-    private void Awake()
-    {
-        player = GameObject.Find("Player");
-        CreatePool();
-    }
-
     private void Start()
     {
         currentPlatform = GameObject.FindWithTag("BPlatform").GetComponent<Platform>();
+        player = GameObject.Find("Player");
+        CreatePool();
         SpawnPlatform();
     }
 

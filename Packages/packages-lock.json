@@ -293,6 +293,13 @@
       },
       "url": "https://packages.unity.com"
     },
+    "io.sentry.unity": {
+      "version": "https://github.com/getsentry/unity.git#2.1.1",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "91994ee1e1795171c1785534b429d8a2b4bd5d9b"
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,

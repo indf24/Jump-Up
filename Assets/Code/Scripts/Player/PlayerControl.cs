@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
@@ -29,7 +30,7 @@ public class PlayerControl : MonoBehaviour
 
     void Update()
     {
-        if (playerManager.canJump)
+        if (playerManager.isTouchAllowed)
         {
             if (Input.touchCount > 0)
             {
@@ -50,7 +51,7 @@ public class PlayerControl : MonoBehaviour
                     trajectoryManager.DespawnDots();
                     jumpVector = LimitJumpForce(jumpVector, minJumpForce, maxJumpForce);
                     Jump(jumpVector, minJumpForce, maxJumpForce);
-                    playerManager.canJump = false;
+                    playerManager.isTouchAllowed = false;
                     StartCoroutine(playerManager.NotGrounded());
                     StartCoroutine(platformManager.DespawnPlatform());
                     jumpVector = new();

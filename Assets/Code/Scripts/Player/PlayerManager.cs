@@ -11,7 +11,7 @@ public class PlayerManager : MonoBehaviour
     private Rigidbody2D playerRb;
     private Collider2D playerCollider;
 
-    public bool canJump = true;
+    public bool isTouchAllowed = false;
     public bool alreadyGrounded = false;
 
     private RaycastHit2D hit;

@@ -1,7 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -13,7 +9,6 @@ public class PlayerControl : MonoBehaviour
     private Rigidbody2D player;
 
     Touch touch = new();
-    Vector2 jumpVector = new();
 
     private Vector2 startTouchPosition;
     private Vector2 endTouchPosition;
@@ -28,16 +23,15 @@ public class PlayerControl : MonoBehaviour
         player = GetComponent<Rigidbody2D>();
     }
 
+    // Manages the entire player control by detecting screen touch
     void Update()
     {
-        if (playerManager.isTouchAllowed)
+        if (playerManager.isTouchAllowed && Input.touchCount > 0)
         {
-            if (Input.touchCount > 0)
-            {
-                touch = Input.GetTouch(0);
-                jumpVector = CalculateJump(touch);
-            }
+            touch = Input.GetTouch(0);
+            Vector2 jumpVector = CalculateJump(touch);
 
+            // Enables the jump if its force is above a threshold
             if (jumpVector.magnitude > minJumpForce)
             {
                 if (touch.phase is TouchPhase.Moved)
@@ -52,33 +46,28 @@ public class PlayerControl : MonoBehaviour
                     jumpVector = LimitJumpForce(jumpVector, minJumpForce, maxJumpForce);
                     Jump(jumpVector, minJumpForce, maxJumpForce);
                     playerManager.isTouchAllowed = false;
-                    StartCoroutine(playerManager.NotGrounded());
                     StartCoroutine(platformManager.DespawnPlatform());
-                    jumpVector = new();
                 }
-            } 
+            }
         }
     }
 
     private Vector2 CalculateJump(Touch touch)
     {
-        // Handle touch begin
+        Vector2 jumpVector = Vector2.zero;
+
         if (touch.phase is TouchPhase.Began)
         {
-            // Get the touch position
             startTouchPosition = touch.position;
         }
 
         if (touch.phase is TouchPhase.Moved or TouchPhase.Ended)
         {
-            // Get the vector direction and force  
             endTouchPosition = touch.position;
-            Vector2 jumpVector = startTouchPosition - endTouchPosition;
-
-            return jumpVector;
+            jumpVector = startTouchPosition - endTouchPosition;
         }
 
-        return Vector2.zero;
+        return jumpVector;
     }
 
     private Vector2 LimitJumpForce(Vector2 jumpVector, float minJumpForce, float maxJumpForce)
@@ -92,4 +81,8 @@ public class PlayerControl : MonoBehaviour
         player.AddForce(jumpVector, ForceMode2D.Impulse);
     }
 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        playerManager.PlatformCollision();
+    }
 }

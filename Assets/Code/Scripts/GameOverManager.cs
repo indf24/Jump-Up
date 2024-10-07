@@ -15,16 +15,19 @@ public class GameOverManager : MonoBehaviour
         //gameOverButtons = GameObject.Find("GameOverButtons");
     }
 
+    // Reloads the current game mode scene
     private void Restart()
     {
         sceneControl.ReloadScene();
     }
 
+    // Loads to the main menu scene
     private void GoToMenu()
     {
         sceneControl.LoadScene("MainMenu");
     }
 
+    // Shows the game over screen on game over
     private void OnTriggerEnter2D(Collider2D collision)
     {
         gameOverButtons.SetActive(true);

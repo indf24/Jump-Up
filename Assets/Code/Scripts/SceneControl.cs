@@ -11,17 +11,21 @@ public class SceneControl : MonoBehaviour
         StartCoroutine(DisableTouchBetweenScenes());
     }
 
+    // Reloads the current scene
     public void ReloadScene()
     {
         Scene scene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(scene.name);
     }
 
+
+    // Loads a scene
     public void LoadScene(string sceneName)
     {
         SceneManager.LoadScene(sceneName);
     }
 
+    // Disables player input on scene transition to stop unintentional player movement
     public IEnumerator DisableTouchBetweenScenes()
     {
         playerManager.isTouchAllowed = false;

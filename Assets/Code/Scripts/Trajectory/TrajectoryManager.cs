@@ -11,11 +11,12 @@ public class TrajectoryManager : MonoBehaviour
     private int poolSize = 100;
     private Queue<TrajectoryDot> trajectoryDotPool = new();
 
-    private void Awake()
+    private void Start()
     {
         CreatePool();
     }
 
+    // Creates a pool of trajectory dots to use throughout the game
     private void CreatePool()
     {
         for (int i = 0; i < poolSize; i++)
@@ -27,6 +28,7 @@ public class TrajectoryManager : MonoBehaviour
         }
     }
 
+    // Creates a new trajectory when needed
     public void MakeTrajectory(Touch touch, Rigidbody2D rigidbody, Vector2 jumpVector, int steps)
     {
         if (touch.phase is TouchPhase.Moved)
@@ -37,6 +39,7 @@ public class TrajectoryManager : MonoBehaviour
         }
     }
 
+    // Calculates where the trajectory dots should be placed
     private List<Vector2> CalculateTrajectory(Rigidbody2D rigidbody, Vector2 pos, Vector2 dragVector, int steps)
     {
         List<Vector2> points = new();
@@ -59,6 +62,7 @@ public class TrajectoryManager : MonoBehaviour
         return points;
     }
 
+    // Places the trajectory dots
     private void DrawTrajectory(List<Vector2> trajectoryPoints)
     {
         int sampleRate = 10;
@@ -70,6 +74,7 @@ public class TrajectoryManager : MonoBehaviour
         }
     }
 
+    // Spawns a trajectory dot from the pool if any are available, otherwise instantiate a new one and spawn that one
     private TrajectoryDot SpawnDot(Vector2 spawnPosition)
     {
         TrajectoryDot dot;
@@ -77,17 +82,18 @@ public class TrajectoryManager : MonoBehaviour
         if (trajectoryDotPool.Any())
         {
             dot = trajectoryDotPool.Dequeue();
-            dot.Spawn(spawnPosition);
         }
         else
         {
-            GameObject obj = Instantiate(trajectoryDotPrefab, spawnPosition, Quaternion.identity);
+            GameObject obj = Instantiate(trajectoryDotPrefab);
             dot = obj.GetComponent<TrajectoryDot>();
         }
 
+        dot.Spawn(spawnPosition);
         return dot;
     }
 
+    // Despawns all the trajectory dots
     public void DespawnDots()
     {  
         for (int i = 0; i < transform.childCount; i++)

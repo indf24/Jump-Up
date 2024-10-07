@@ -1,7 +1,5 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -12,7 +10,6 @@ public class PlayerManager : MonoBehaviour
     private Collider2D playerCollider;
 
     public bool isTouchAllowed = false;
-    public bool alreadyGrounded = false;
 
     private RaycastHit2D hit;
 
@@ -23,41 +20,38 @@ public class PlayerManager : MonoBehaviour
         playerCollider = player.GetComponent<CircleCollider2D>();
     }
 
-    private void Update()
-    {
-        if (IsGrounded() && !alreadyGrounded)
-        {
-            StopMovement();
-            alreadyGrounded = true;
-            scoreManager.AddPoints(1);
-            StartCoroutine(platformManager.MovePlatform());
-        }
-    }
-
+    // Stops the player
     private void StopMovement()
-    {
-        // Stop the ball
+    { 
         playerRb.constraints = RigidbodyConstraints2D.FreezePositionX;
         playerRb.velocity = Vector2.zero;
     }
 
+    // Checks if the player is in contact the top of a platform  
     private bool IsGrounded()
     {
-        // Check if the player is touching the top of the platform  
-        CreateGroudedRay();
         return hit.collider != null && hit.collider.CompareTag("Platform");
     }
 
+    // Creates a raycast for detection of contact between the player and a platform
     private void CreateGroudedRay()
     {
         Vector2 rayOrigin = playerRb.position - new Vector2(0, (playerCollider.bounds.size.y / 2) + 0.002f);
-        float rayDistance = 0.03f;
+        float rayDistance = 0.1f;
         hit = Physics2D.Raycast(rayOrigin, Vector2.down, rayDistance);
+
+        Debug.DrawRay(rayOrigin, Vector2.down * rayDistance, Color.red, 0.1f);
     }
 
-    public IEnumerator NotGrounded()
+    // Executes a sequence of events if the player is on top of a platform
+    public void PlatformCollision()
     {
-        yield return new WaitForSeconds(0.2f);
-        alreadyGrounded = false;
+        CreateGroudedRay();
+        if (IsGrounded())
+        {
+            StopMovement();
+            scoreManager.AddPoints(1);
+            StartCoroutine(platformManager.MovePlatform());
+        }
     }
 }

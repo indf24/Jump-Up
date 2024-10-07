@@ -13,17 +13,20 @@ public class ScoreManager : MonoBehaviour
         scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
     }
 
+    // Adds points to the score
     public void AddPoints(int points)
     {
         score += points;
         UpdateScore(score);
     }
 
+    // Updates the score counter in the screen
     private void UpdateScore(int score)
     {
         scoreText.text = score.ToString();
     }
 
+    // Update the high score on game over
     public void UpdateHighScore()
     {
         if (score > highScore)

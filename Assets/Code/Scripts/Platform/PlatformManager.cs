@@ -26,7 +26,8 @@ public class PlatformManager : MonoBehaviour
         SpawnPlatform();
     }
 
-    private void CreatePool()
+    // Creates a pool of platforms to use throughout the game
+    private void CreatePool() 
     {
         for (int i = 0; i < poolSize; i++)
         {
@@ -37,7 +38,8 @@ public class PlatformManager : MonoBehaviour
         }
     }
 
-    public void SpawnPlatform()
+    // Spawns a platform from the pool if any are available, otherwise instantiate a new one and spawn that one
+    public void SpawnPlatform() 
     {
         if (platformPool.Any())
         {
@@ -52,11 +54,13 @@ public class PlatformManager : MonoBehaviour
         nextPlatform.Spawn(player.transform.position.x);
     }
 
-    public IEnumerator MovePlatform()
+    // Moves the platfrom where the player land downwards to a predefined position
+    public IEnumerator MovePlatform() 
     {
-        currentPlatform = nextPlatform; //Designate the platform where the player is as the current one
+        currentPlatform = nextPlatform;
 
-        player.transform.parent = currentPlatform.transform; //Make the player a child object of the current platform to move together
+        // Makes the player a child object of the current platform to make them move together
+        player.transform.parent = currentPlatform.transform; 
 
         yield return new WaitForSeconds(0.5f);
 
@@ -65,12 +69,13 @@ public class PlatformManager : MonoBehaviour
 
         float speed = 15f;
 
-        while (currentYPos > targetYPos) // Move the platform down smoothly
+        // Moves the platform down smoothly
+        while (currentYPos > targetYPos) 
         {
             float moveDistance = speed * Time.deltaTime;
             currentYPos -= moveDistance;
 
-            currentPlatform.transform.position += Vector3.down * moveDistance;
+            currentPlatform.Move(moveDistance);
 
             yield return null;
         }
@@ -82,19 +87,21 @@ public class PlatformManager : MonoBehaviour
         playerManager.isTouchAllowed = true;
     }
 
-    public IEnumerator DespawnPlatform()
+    // Despawns the platform the player jumped from
+    public IEnumerator DespawnPlatform() 
     {
         if (currentPlatform.CompareTag("BPlatform"))
         {
-            // Despawn the first platform
             currentPlatform.Despawn();
         }
         else
         {
-            animator = currentPlatform.GetComponent<Animator>(); //Get the current platforms animator
-            // Play despawn animation and despawn the platform
+            animator = currentPlatform.GetComponent<Animator>();
             animator.SetTrigger("Despawn");
+
+            // Wait for the despawn animation to end
             yield return new WaitForSeconds(0.1f);
+
             currentPlatform.Despawn();
             platformPool.Enqueue(currentPlatform);
         }

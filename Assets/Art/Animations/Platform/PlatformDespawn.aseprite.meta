@@ -230,7 +230,7 @@ ScriptedImporter:
     layerType: 0
     blendMode: 0
     cells:
-    - name: PlatformDespawn_Frame_0
+    - name: Frame_0
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
@@ -239,7 +239,7 @@ ScriptedImporter:
         width: 10
         height: 2
       spriteId: 2f59444f2f593e04ea2eece85f1e55d1
-    - name: PlatformDespawn_Frame_1
+    - name: Frame_1
       frameIndex: 1
       additiveSortOrder: 0
       cellRect:
@@ -248,7 +248,7 @@ ScriptedImporter:
         width: 8
         height: 2
       spriteId: e34967c19d0968949bfa84900e0ffc26
-    - name: PlatformDespawn_Frame_2
+    - name: Frame_2
       frameIndex: 2
       additiveSortOrder: 0
       cellRect:
@@ -257,7 +257,7 @@ ScriptedImporter:
         width: 6
         height: 2
       spriteId: fcfce1d0b55813245896943cabfc9f9d
-    - name: PlatformDespawn_Frame_3
+    - name: Frame_3
       frameIndex: 3
       additiveSortOrder: 0
       cellRect:
@@ -266,7 +266,7 @@ ScriptedImporter:
         width: 4
         height: 2
       spriteId: 24f723233686e8a4baa3799154766355
-    - name: PlatformDespawn_Frame_4
+    - name: Frame_4
       frameIndex: 4
       additiveSortOrder: 0
       cellRect:

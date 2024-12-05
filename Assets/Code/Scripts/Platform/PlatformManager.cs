@@ -81,7 +81,7 @@ public class PlatformManager : MonoBehaviour
         }
 
         player.transform.parent = null;
-        player.GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.None;
+        player.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePositionX;
 
         SpawnPlatform();
         playerManager.isTouchAllowed = true;

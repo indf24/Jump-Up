@@ -23,7 +23,7 @@ public class PlayerManager : MonoBehaviour
     // Stops the player
     private void StopMovement()
     { 
-        playerRb.constraints = RigidbodyConstraints2D.FreezePositionX;
+        playerRb.constraints |= RigidbodyConstraints2D.FreezePositionX;
         playerRb.velocity = Vector2.zero;
     }
 

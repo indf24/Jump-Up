@@ -929,7 +929,7 @@ Rigidbody2D:
   m_UseAutoMass: 0
   m_Mass: 25
   m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 0
   m_GravityScale: 4
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -1057,9 +1057,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d556e34b0c110ea40b1c93c84d1c918c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerManager: {fileID: 533964047}
-  platformManager: {fileID: 1980430213}
-  trajectoryManager: {fileID: 41708058}
 --- !u!1 &533964045
 GameObject:
   m_ObjectHideFlags: 0
@@ -1104,9 +1101,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1004cebfd80895147ac676ea2c6f44e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  platformManager: {fileID: 1980430213}
-  scoreManager: {fileID: 1145104185}
-  isTouchAllowed: 0
 --- !u!1 &652507401
 GameObject:
   m_ObjectHideFlags: 0
@@ -1242,8 +1236,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e85c72db9de1e3f43a20f96dec0cda8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneControl: {fileID: 2144763467}
-  scoreManager: {fileID: 0}
   gameOverButtons: {fileID: 0}
   retryButton: {fileID: 0}
   menuButton: {fileID: 0}
@@ -1484,6 +1476,50 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74eb5a056b5f5b44883926ef506e71d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1291561424
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1291561426}
+  - component: {fileID: 1291561425}
+  m_Layer: 0
+  m_Name: '[Delete]GameSettings'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1291561425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291561424}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ffd139b0d4fdff4db3d9234f56774c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1291561426
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1291561424}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.0354018, y: 7.3948007, z: -0.025337148}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1344700865
 GameObject:
   m_ObjectHideFlags: 0
@@ -1666,8 +1702,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e85c72db9de1e3f43a20f96dec0cda8c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneControl: {fileID: 2144763467}
-  scoreManager: {fileID: 1145104185}
   gameOverButtons: {fileID: 119038840}
   retryButton: {fileID: 652507403}
   menuButton: {fileID: 259347219}
@@ -1937,7 +1971,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd2f402a2058a9c488fb9930425a6087, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerManager: {fileID: 533964047}
   platformPrefab: {fileID: 6989403617583026991, guid: 47b2f0b0340f4e04c8d3cbe0985b86cc, type: 3}
 --- !u!4 &1980430214
 Transform:
@@ -1983,7 +2016,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a6d29cba85a54943a268588b0f6c8bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerManager: {fileID: 533964047}
 --- !u!4 &2144763468
 Transform:
   m_ObjectHideFlags: 0
@@ -2010,3 +2042,4 @@ SceneRoots:
   - {fileID: 1382065687}
   - {fileID: 305327084}
   - {fileID: 1344700869}
+  - {fileID: 1291561426}

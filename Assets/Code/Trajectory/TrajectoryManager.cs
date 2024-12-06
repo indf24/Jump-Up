@@ -16,6 +16,24 @@ public class TrajectoryManager : MonoBehaviour
         CreatePool();
     }
 
+    private void OnEnable()
+    {
+        EventHub.OnPlayerAim += MakeTrajectory;
+        EventHub.OnPlayerJump += DespawnDots;
+    }
+
+    private void OnDisable()
+    {
+        EventHub.OnPlayerAim -= MakeTrajectory;
+        EventHub.OnPlayerJump -= DespawnDots;
+    }
+
+    private void OnDestroy()
+    {
+        EventHub.OnPlayerAim -= MakeTrajectory;
+        EventHub.OnPlayerJump -= DespawnDots;
+    }
+
     // Creates a pool of trajectory dots to use throughout the game
     private void CreatePool()
     {

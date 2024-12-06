@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 
 public class MainMenuManager : MonoBehaviour
 {
-    [SerializeField] private SceneControl sceneControl;
     void Update()
     {
         if (Input.touchCount > 0)
@@ -40,7 +39,7 @@ public class MainMenuManager : MonoBehaviour
                 // If no UI element was hit, handle the click
                 if (!hitUI)
                 {
-                    sceneControl.LoadScene("GameMode1");
+                    SceneControl.LoadScene("GameMode1");
                 }
             }
         }

@@ -1,15 +1,14 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    [SerializeField] private PlatformManager platformManager;
-    [SerializeField] private ScoreManager scoreManager;
-
     private Rigidbody2D playerRb;
     private Collider2D playerCollider;
 
-    public bool isTouchAllowed = false;
+    private static bool playerInputAllowed = false;
+    public static bool PlayerInputAllowed => playerInputAllowed;
 
     private RaycastHit2D hit;
 
@@ -19,6 +18,25 @@ public class PlayerManager : MonoBehaviour
         playerRb = player.GetComponent<Rigidbody2D>();
         playerCollider = player.GetComponent<CircleCollider2D>();
     }
+
+    private void OnEnable()
+    {
+        EventHub.OnPlatformCollision += PlatformCollision;
+    }
+
+    private void OnDisable()
+    {
+        EventHub.OnPlatformCollision -= PlatformCollision;
+    }
+
+    private void OnDestroy()
+    {
+        EventHub.OnPlatformCollision -= PlatformCollision;
+    }
+
+    // Methods to safely modify the value
+    public static void EnableInput() => playerInputAllowed = true;
+    public static void DisableInput() => playerInputAllowed = false;
 
     // Stops the player
     private void StopMovement()
@@ -50,8 +68,8 @@ public class PlayerManager : MonoBehaviour
         if (IsGrounded())
         {
             StopMovement();
-            scoreManager.AddPoints(1);
-            StartCoroutine(platformManager.MovePlatform());
+            Debug.Log("aaa");
+            EventHub.PlayerLand(1);
         }
     }
 }

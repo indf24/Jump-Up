@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class PlatformManager : MonoBehaviour
 {
-    [SerializeField] private PlayerManager playerManager;
-
     private GameObject player;
 
     [SerializeField] private GameObject platformPrefab;
@@ -26,6 +24,24 @@ public class PlatformManager : MonoBehaviour
         SpawnPlatform();
     }
 
+    private void OnEnable()
+    {
+        EventHub.OnPlayerLanding += StartMovePlatform;
+        EventHub.OnPlayerJump += StartDespawnPlatform;
+    }
+
+    private void OnDisable()
+    {
+        EventHub.OnPlayerLanding -= StartMovePlatform;
+        EventHub.OnPlayerJump -= StartDespawnPlatform;
+    }
+
+    private void OnDestroy()
+    {
+        EventHub.OnPlayerLanding -= StartMovePlatform;
+        EventHub.OnPlayerJump -= StartDespawnPlatform;
+    }
+
     // Creates a pool of platforms to use throughout the game
     private void CreatePool() 
     {
@@ -39,7 +55,7 @@ public class PlatformManager : MonoBehaviour
     }
 
     // Spawns a platform from the pool if any are available, otherwise instantiate a new one and spawn that one
-    public void SpawnPlatform() 
+    private void SpawnPlatform() 
     {
         if (platformPool.Any())
         {
@@ -52,6 +68,11 @@ public class PlatformManager : MonoBehaviour
         }
 
         nextPlatform.Spawn(player.transform.position.x);
+    }
+
+    private void StartMovePlatform()
+    {
+        StartCoroutine(MovePlatform());
     }
 
     // Moves the platfrom where the player land downwards to a predefined position
@@ -68,11 +89,11 @@ public class PlatformManager : MonoBehaviour
         float targetYPos = 3.5f;
 
         float speed = 15f;
+        float moveDistance = speed * Time.deltaTime;
 
         // Moves the platform down smoothly
         while (currentYPos > targetYPos) 
-        {
-            float moveDistance = speed * Time.deltaTime;
+        {       
             currentYPos -= moveDistance;
 
             currentPlatform.Move(moveDistance);
@@ -84,7 +105,12 @@ public class PlatformManager : MonoBehaviour
         player.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePositionX;
 
         SpawnPlatform();
-        playerManager.isTouchAllowed = true;
+        PlayerManager.EnableInput();
+    }
+
+    private void StartDespawnPlatform()
+    {
+        StartCoroutine(DespawnPlatform());
     }
 
     // Despawns the platform the player jumped from

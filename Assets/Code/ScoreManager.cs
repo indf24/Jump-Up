@@ -13,15 +13,33 @@ public class ScoreManager : MonoBehaviour
         scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
     }
 
+    private void OnEnable()
+    {
+        EventHub.OnScoreEarned += AddPoints;
+        EventHub.OnGameOver += UpdateHighScore;
+    }
+
+    private void OnDisable()
+    {
+        EventHub.OnScoreEarned -= AddPoints;
+        EventHub.OnGameOver -= UpdateHighScore;
+    }
+
+    private void OnDestroy()
+    {
+        EventHub.OnScoreEarned -= AddPoints;
+        EventHub.OnGameOver -= UpdateHighScore;
+    }
+
     // Adds points to the score
     public void AddPoints(int points)
     {
         score += points;
-        UpdateScore(score);
+        UpdateScore();
     }
 
     // Updates the score counter in the screen
-    private void UpdateScore(int score)
+    private void UpdateScore()
     {
         scoreText.text = score.ToString();
     }

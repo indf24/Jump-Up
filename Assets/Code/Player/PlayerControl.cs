@@ -2,10 +2,6 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
 {
-    [SerializeField] private PlayerManager playerManager;
-    [SerializeField] private PlatformManager platformManager;
-    [SerializeField] private TrajectoryManager trajectoryManager;
-
     private Rigidbody2D player;
 
     Touch touch = new();
@@ -26,7 +22,7 @@ public class PlayerControl : MonoBehaviour
     // Manages the entire player control by detecting screen touch
     void Update()
     {
-        if (playerManager.isTouchAllowed && Input.touchCount > 0)
+        if (PlayerManager.PlayerInputAllowed && Input.touchCount > 0)
         {
             touch = Input.GetTouch(0);
             Vector2 jumpVector = CalculateJump(touch);
@@ -37,20 +33,20 @@ public class PlayerControl : MonoBehaviour
                 if (touch.phase is TouchPhase.Moved)
                 {
                     jumpVector = LimitJumpForce(jumpVector, minJumpForce, maxJumpForce);
-                    trajectoryManager.MakeTrajectory(touch, player, jumpVector, trajectorySteps);
+                    EventHub.PlayerAim(touch, player, jumpVector, trajectorySteps);
                 }
 
                 if (touch.phase is TouchPhase.Ended)
                 {
-                    trajectoryManager.DespawnDots();
                     jumpVector = LimitJumpForce(jumpVector, minJumpForce, maxJumpForce);
                     Jump(jumpVector, minJumpForce, maxJumpForce);
-                    playerManager.isTouchAllowed = false;
-                    StartCoroutine(platformManager.DespawnPlatform());
+                    PlayerManager.DisableInput();
+                    EventHub.PlayerJump();
                 }
             }
         }
     }
+
 
     private Vector2 CalculateJump(Touch touch)
     {
@@ -83,6 +79,6 @@ public class PlayerControl : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        playerManager.PlatformCollision();
+        EventHub.PlatformCollision();
     }
 }

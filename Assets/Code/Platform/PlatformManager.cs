@@ -86,7 +86,7 @@ public class PlatformManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         float currentYPos = currentPlatform.transform.position.y;
-        float targetYPos = 3.5f;
+        float targetYPos = 5.75f;
 
         float speed = 15f;
         float moveDistance = speed * Time.deltaTime;
@@ -95,7 +95,6 @@ public class PlatformManager : MonoBehaviour
         while (currentYPos > targetYPos) 
         {       
             currentYPos -= moveDistance;
-
             currentPlatform.Move(moveDistance);
 
             yield return null;

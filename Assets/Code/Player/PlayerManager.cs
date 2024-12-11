@@ -6,6 +6,7 @@ public class PlayerManager : MonoBehaviour
 {
     private Rigidbody2D playerRb;
     private Collider2D playerCollider;
+    private Transform sprite;
 
     private static bool playerInputAllowed = false;
     public static bool PlayerInputAllowed => playerInputAllowed;
@@ -17,6 +18,7 @@ public class PlayerManager : MonoBehaviour
         GameObject player = GameObject.Find("Player");
         playerRb = player.GetComponent<Rigidbody2D>();
         playerCollider = player.GetComponent<CircleCollider2D>();
+        sprite = player.transform.GetChild(1);
     }
 
     private void OnEnable()
@@ -32,6 +34,11 @@ public class PlayerManager : MonoBehaviour
     private void OnDestroy()
     {
         EventHub.OnPlatformCollision -= PlatformCollision;
+    }
+
+    private void Update()
+    {
+        sprite.rotation = Quaternion.identity;
     }
 
     // Methods to safely modify the value
@@ -52,23 +59,32 @@ public class PlayerManager : MonoBehaviour
     }
 
     // Creates a raycast for detection of contact between the player and a platform
-    private void CreateGroudedRay()
+    private IEnumerator CreateGroudedRay()
     {
-        Vector2 rayOrigin = playerRb.position - new Vector2(0, (playerCollider.bounds.size.y / 2) + 0.002f);
-        float rayDistance = 0.1f;
-        hit = Physics2D.Raycast(rayOrigin, Vector2.down, rayDistance);
+        float duration = 0.5f;
+        float elapsedTime = 0f;
 
-        Debug.DrawRay(rayOrigin, Vector2.down * rayDistance, Color.red, 0.1f);
+        while (elapsedTime < duration)
+        {
+            Vector2 rayOrigin = playerRb.position - new Vector2(0, (playerCollider.bounds.size.y / 2) + 0.002f);
+            float rayDistance = 0.1f;
+            hit = Physics2D.Raycast(rayOrigin, Vector2.down, rayDistance);
+
+            Debug.DrawRay(rayOrigin, Vector2.down * rayDistance, Color.red, 0.1f);
+
+            yield return null;
+
+            elapsedTime += Time.deltaTime;
+        }
     }
 
     // Executes a sequence of events if the player is on top of a platform
-    public void PlatformCollision()
+    private void PlatformCollision()
     {
-        CreateGroudedRay();
+        StartCoroutine(CreateGroudedRay());
         if (IsGrounded())
         {
             StopMovement();
-            Debug.Log("aaa");
             EventHub.PlayerLand(1);
         }
     }

@@ -28,6 +28,7 @@ public class GameOverManager : MonoBehaviour
         retryButton.onClick.AddListener(() => SceneControl.ReloadScene());
         menuButton.onClick.AddListener(() => SceneControl.LoadScene("MainMenu"));
     }
+
     private void ShowGameOverScreen()
     {
         gameOverButtons.SetActive(true);

@@ -3,14 +3,14 @@ using UnityEngine;
 public class Platform : MonoBehaviour
 {
     private char spawnSide;
-    private float nextPlatformOffset = 2f;
+    private float nextPlatformOffset = 5f;
 
     private float xSpawnPos;
-    private float xSpawnPosRange = 4f;
+    private float xSpawnPosRange = 6.5f;
 
     private float ySpawnPos;
-    private float ySpawnPosMin = 8f;
-    private float ySpawnPosMax = 15f;
+    private float ySpawnPosMin = 11.75f;
+    private float ySpawnPosMax = 23.75f;
 
     // Gets a random position from SpawnPosition() and spawn the platform there
     public void Spawn(float playerXPosition) 

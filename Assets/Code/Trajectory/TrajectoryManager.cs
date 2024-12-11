@@ -18,19 +18,16 @@ public class TrajectoryManager : MonoBehaviour
 
     private void OnEnable()
     {
-        EventHub.OnPlayerAim += MakeTrajectory;
         EventHub.OnPlayerJump += DespawnDots;
     }
 
     private void OnDisable()
     {
-        EventHub.OnPlayerAim -= MakeTrajectory;
         EventHub.OnPlayerJump -= DespawnDots;
     }
 
     private void OnDestroy()
     {
-        EventHub.OnPlayerAim -= MakeTrajectory;
         EventHub.OnPlayerJump -= DespawnDots;
     }
 

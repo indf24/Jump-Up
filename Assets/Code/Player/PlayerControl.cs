@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
 {
+    [SerializeField] private TrajectoryManager trajectoryManager;
+
     private Rigidbody2D player;
 
     Touch touch = new();
@@ -10,7 +12,7 @@ public class PlayerControl : MonoBehaviour
     private Vector2 endTouchPosition;
 
     private float minJumpForce = 100f;
-    private float maxJumpForce = 800f;
+    private float maxJumpForce = 1350f;
 
     private int trajectorySteps = 1000;
 
@@ -30,16 +32,17 @@ public class PlayerControl : MonoBehaviour
             // Enables the jump if its force is above a threshold
             if (jumpVector.magnitude > minJumpForce)
             {
+                jumpVector = LimitJumpForce(jumpVector);
+
                 if (touch.phase is TouchPhase.Moved)
-                {
-                    jumpVector = LimitJumpForce(jumpVector, minJumpForce, maxJumpForce);
-                    EventHub.PlayerAim(touch, player, jumpVector, trajectorySteps);
+                {              
+                    trajectoryManager.MakeTrajectory(touch, player, jumpVector, trajectorySteps);
                 }
 
                 if (touch.phase is TouchPhase.Ended)
                 {
-                    jumpVector = LimitJumpForce(jumpVector, minJumpForce, maxJumpForce);
-                    Jump(jumpVector, minJumpForce, maxJumpForce);
+                    trajectoryManager.DespawnDots();
+                    Jump(jumpVector);
                     PlayerManager.DisableInput();
                     EventHub.PlayerJump();
                 }
@@ -66,12 +69,12 @@ public class PlayerControl : MonoBehaviour
         return jumpVector;
     }
 
-    private Vector2 LimitJumpForce(Vector2 jumpVector, float minJumpForce, float maxJumpForce)
+    private Vector2 LimitJumpForce(Vector2 jumpVector)
     {
         return jumpVector.normalized * Mathf.Clamp(jumpVector.magnitude, minJumpForce, maxJumpForce);
     }
 
-    private void Jump(Vector2 jumpVector, float minJumpForce, float maxJumpForce)
+    private void Jump(Vector2 jumpVector)
     {
         // Apply the force to the ball
         player.AddForce(jumpVector, ForceMode2D.Impulse);

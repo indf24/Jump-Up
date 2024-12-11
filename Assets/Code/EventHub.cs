@@ -13,7 +13,6 @@ public class EventHub : MonoBehaviour
 
     public static event Action OnPlatformCollision;
 
-    public static event Action<Touch, Rigidbody2D, Vector2, int> OnPlayerAim;
     public static event Action OnPlayerJump;
 
     public static void PlayerLand(int points)
@@ -30,11 +29,6 @@ public class EventHub : MonoBehaviour
     public static void PlatformCollision()
     {
         OnPlatformCollision?.Invoke();
-    }
-
-    public static void PlayerAim(Touch touch, Rigidbody2D player, Vector2 jumpVector, int trajectorySteps)
-    {
-        OnPlayerAim?.Invoke(touch, player, jumpVector, trajectorySteps);
     }
 
     public static void PlayerJump()

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 85ab0ffae5067904784b88e17f5ff5d2
+guid: 52a289e26ab7a1a4da7dec6e181d0e2d
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,7 +97,7 @@ ScriptedImporter:
     addSortingGroup: 1
     addShadowCasters: 0
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638695304089798837
+  platformSettingsDirtyTick: 638695429440355629
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -121,7 +121,27 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: Ball 1
+  - name: Frame_0
+    originalName: 
+    pivot: {x: 0.5, y: 0.61538464}
+    alignment: 9
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 26
+      y: 4
+      width: 16
+      height: 13
+    spriteID: 2d14a9a92ad6ff246b0dae7992035993
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 26, y: 4}
+  - name: Frame_1
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -130,9 +150,9 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 16
+      width: 14
       height: 16
-    spriteID: d57add9b90256734d82e537ecc533d98
+    spriteID: 6f2e46552fbb5384c815f6453580efa3
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -141,24 +161,62 @@ ScriptedImporter:
     edges: []
     tessellationDetail: 0
     uvTransform: {x: 4, y: 4}
+  - name: Frame_2
+    originalName: 
+    pivot: {x: 0.5, y: 0.5}
+    alignment: 0
+    border: {x: 0, y: 0, z: 0, w: 0}
+    rect:
+      serializedVersion: 2
+      x: 4
+      y: 28
+      width: 11
+      height: 16
+    spriteID: fe77221e525ff7544bfa4aa0383f134c
+    spriteBone: []
+    spriteOutline: []
+    vertices: []
+    spritePhysicsOutline: []
+    indices: 
+    edges: []
+    tessellationDetail: 0
+    uvTransform: {x: 4, y: 28}
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: -1057111960
-    name: Ball 1
+    guid: -1459056680
+    name: BallRelease
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: Ball
+    - name: Frame_0
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
         x: 0
         y: 0
         width: 16
+        height: 13
+      spriteId: 2d14a9a92ad6ff246b0dae7992035993
+    - name: Frame_1
+      frameIndex: 1
+      additiveSortOrder: 0
+      cellRect:
+        x: 1
+        y: 0
+        width: 14
         height: 16
-      spriteId: d57add9b90256734d82e537ecc533d98
+      spriteId: 6f2e46552fbb5384c815f6453580efa3
+    - name: Frame_2
+      frameIndex: 2
+      additiveSortOrder: 0
+      cellRect:
+        x: 3
+        y: 0
+        width: 11
+        height: 16
+      spriteId: fe77221e525ff7544bfa4aa0383f134c
     linkedCells: []
     parentIndex: -1
   platformSettings:

@@ -7,6 +7,7 @@ public class PlayerManager : MonoBehaviour
     private Rigidbody2D playerRb;
     private Collider2D playerCollider;
     private Transform sprite;
+    private Animator animator;
 
     private static bool playerInputAllowed = false;
     public static bool PlayerInputAllowed => playerInputAllowed;
@@ -19,21 +20,25 @@ public class PlayerManager : MonoBehaviour
         playerRb = player.GetComponent<Rigidbody2D>();
         playerCollider = player.GetComponent<CircleCollider2D>();
         sprite = player.transform.GetChild(1);
+        animator = sprite.GetComponent<Animator>();
     }
 
     private void OnEnable()
     {
         EventHub.OnPlatformCollision += PlatformCollision;
+        EventHub.RunPlayerAnimation += PlayerAnimation;
     }
 
     private void OnDisable()
     {
         EventHub.OnPlatformCollision -= PlatformCollision;
+        EventHub.RunPlayerAnimation -= PlayerAnimation;
     }
 
     private void OnDestroy()
     {
         EventHub.OnPlatformCollision -= PlatformCollision;
+        EventHub.RunPlayerAnimation -= PlayerAnimation;
     }
 
     private void Update()
@@ -61,7 +66,7 @@ public class PlayerManager : MonoBehaviour
     // Creates a raycast for detection of contact between the player and a platform
     private IEnumerator CreateGroudedRay()
     {
-        float duration = 0.5f;
+        float duration = 1f;
         float elapsedTime = 0f;
 
         while (elapsedTime < duration)
@@ -82,10 +87,19 @@ public class PlayerManager : MonoBehaviour
     private void PlatformCollision()
     {
         StartCoroutine(CreateGroudedRay());
+
+        animator.SetBool("Holding", false);
+        animator.SetBool("Flying", false);
+
         if (IsGrounded())
         {
             StopMovement();
             EventHub.PlayerLand(1);
         }
+    }
+
+    private void PlayerAnimation(string animation, bool state)
+    {
+        animator.SetBool(animation, state);
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlatformManager : MonoBehaviour
@@ -85,20 +86,10 @@ public class PlatformManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
-        float currentYPos = currentPlatform.transform.position.y;
-        float targetYPos = 5.75f;
-
+        Vector2 targetPos = new Vector2(currentPlatform.transform.position.x, 5.75f);
         float speed = 15f;
-        float moveDistance = speed * Time.deltaTime;
 
-        // Moves the platform down smoothly
-        while (currentYPos > targetYPos) 
-        {       
-            currentYPos -= moveDistance;
-            currentPlatform.Move(moveDistance);
-
-            yield return null;
-        }
+        yield return StartCoroutine(currentPlatform.Move(targetPos, speed));
 
         player.transform.parent = null;
         player.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePositionX;
@@ -117,6 +108,11 @@ public class PlatformManager : MonoBehaviour
     {
         if (currentPlatform.CompareTag("BPlatform"))
         {
+            Vector2 targetPos = new Vector2(currentPlatform.transform.position.x, -1);
+            float speed = 12f;
+
+            yield return StartCoroutine(currentPlatform.Move(targetPos, speed));
+
             currentPlatform.Despawn();
         }
         else
@@ -125,7 +121,7 @@ public class PlatformManager : MonoBehaviour
             animator.SetTrigger("Despawn");
 
             // Wait for the despawn animation to end
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.096f);
 
             currentPlatform.Despawn();
             platformPool.Enqueue(currentPlatform);

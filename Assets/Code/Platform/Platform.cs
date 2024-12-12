@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Platform : MonoBehaviour
@@ -6,7 +7,7 @@ public class Platform : MonoBehaviour
     private float nextPlatformOffset = 5f;
 
     private float xSpawnPos;
-    private float xSpawnPosRange = 6.5f;
+    private float xSpawnPosRange = 5.5f;
 
     private float ySpawnPos;
     private float ySpawnPosMin = 11.75f;
@@ -59,9 +60,13 @@ public class Platform : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    // Moves the platform downwards
-    public void Move(float moveDistance)
+    public IEnumerator Move(Vector2 targetPos, float speed)
     {
-        gameObject.transform.Translate(Vector2.down * moveDistance);
+        while (Vector2.Distance(gameObject.transform.position, targetPos) > 0.01f)
+        {
+            gameObject.transform.position = Vector2.MoveTowards(gameObject.transform.position, targetPos, speed * Time.deltaTime);
+
+            yield return null;
+        }
     }
 }

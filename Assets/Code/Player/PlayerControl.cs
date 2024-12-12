@@ -11,10 +11,12 @@ public class PlayerControl : MonoBehaviour
     private Vector2 startTouchPosition;
     private Vector2 endTouchPosition;
 
-    private float minJumpForce = 100f;
+    private float minJumpForce = 600f;
     private float maxJumpForce = 1350f;
 
     private int trajectorySteps = 1000;
+
+    [SerializeField] private float a;
 
     private void Start()
     {
@@ -28,10 +30,13 @@ public class PlayerControl : MonoBehaviour
         {
             touch = Input.GetTouch(0);
             Vector2 jumpVector = CalculateJump(touch);
+            a = jumpVector.magnitude;
 
             // Enables the jump if its force is above a threshold
             if (jumpVector.magnitude > minJumpForce)
             {
+                EventHub.PlayerAnimation("Holding", true);
+
                 jumpVector = LimitJumpForce(jumpVector);
 
                 if (touch.phase is TouchPhase.Moved)
@@ -45,11 +50,16 @@ public class PlayerControl : MonoBehaviour
                     Jump(jumpVector);
                     PlayerManager.DisableInput();
                     EventHub.PlayerJump();
+                    EventHub.PlayerAnimation("Flying", true);
                 }
+            }
+            else
+            {
+                trajectoryManager.DespawnDots();
+                EventHub.PlayerAnimation("Holding", false);
             }
         }
     }
-
 
     private Vector2 CalculateJump(Touch touch)
     {
@@ -59,11 +69,11 @@ public class PlayerControl : MonoBehaviour
         {
             startTouchPosition = touch.position;
         }
-
-        if (touch.phase is TouchPhase.Moved or TouchPhase.Ended)
+        else
         {
             endTouchPosition = touch.position;
             jumpVector = startTouchPosition - endTouchPosition;
+            jumpVector = jumpVector.normalized * (jumpVector.magnitude + 300); //Change later
         }
 
         return jumpVector;
@@ -82,6 +92,9 @@ public class PlayerControl : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        EventHub.PlatformCollision();
+        if (collision.gameObject.CompareTag("Platform"))
+        {
+            EventHub.PlatformCollision();
+        }
     }
 }

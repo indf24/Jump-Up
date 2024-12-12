@@ -8,21 +8,6 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private Button retryButton;
     [SerializeField] private Button menuButton;
 
-    private void OnEnable()
-    {
-        EventHub.OnGameOver += ShowGameOverScreen;
-    }
-
-    private void OnDisable()
-    {
-        EventHub.OnGameOver -= ShowGameOverScreen;
-    }
-
-    private void OnDestroy()
-    {
-        EventHub.OnGameOver -= ShowGameOverScreen;
-    }
-
     private void Start()
     {
         retryButton.onClick.AddListener(() => SceneControl.ReloadScene());
@@ -37,7 +22,8 @@ public class GameOverManager : MonoBehaviour
     // Shows the game over screen on game over
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        EventHub.GameOver();
+        ShowGameOverScreen();
+        //EventHub.GameOver();
     }
 
 }

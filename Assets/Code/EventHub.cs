@@ -13,6 +13,7 @@ public class EventHub : MonoBehaviour
 
     public static event Action OnPlatformCollision;
 
+    public static event Action<string, bool> RunPlayerAnimation;
     public static event Action OnPlayerJump;
 
     public static void PlayerLand(int points)
@@ -29,6 +30,11 @@ public class EventHub : MonoBehaviour
     public static void PlatformCollision()
     {
         OnPlatformCollision?.Invoke();
+    }
+
+    public static void PlayerAnimation(string animationId, bool state)
+    {
+        RunPlayerAnimation?.Invoke(animationId, state);
     }
 
     public static void PlayerJump()

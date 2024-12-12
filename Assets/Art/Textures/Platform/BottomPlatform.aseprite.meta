@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 85ab0ffae5067904784b88e17f5ff5d2
+guid: 2cf78065c1e62a2458199d5bf6d1aa01
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -97,7 +97,7 @@ ScriptedImporter:
     addSortingGroup: 1
     addShadowCasters: 0
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638695304089798837
+  platformSettingsDirtyTick: 638695405797809700
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -121,7 +121,7 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: Ball 1
+  - name: BottomPlatform
     originalName: 
     pivot: {x: 0.5, y: 0.5}
     alignment: 0
@@ -130,9 +130,9 @@ ScriptedImporter:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 16
-      height: 16
-    spriteID: d57add9b90256734d82e537ecc533d98
+      width: 288
+      height: 8
+    spriteID: 10afefc89caf9ba4281056ef9a1fc4f0
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -144,21 +144,21 @@ ScriptedImporter:
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: -1057111960
-    name: Ball 1
+    guid: 1076521358
+    name: BottomPlatform
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: Ball
+    - name: BottomPlatform
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
         x: 0
         y: 0
-        width: 16
-        height: 16
-      spriteId: d57add9b90256734d82e537ecc533d98
+        width: 288
+        height: 8
+      spriteId: 10afefc89caf9ba4281056ef9a1fc4f0
     linkedCells: []
     parentIndex: -1
   platformSettings:
@@ -225,4 +225,4 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 16, y: 16}
+  canvasSize: {x: 288, y: 8}

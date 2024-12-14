@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlatformManager : MonoBehaviour
@@ -9,13 +8,10 @@ public class PlatformManager : MonoBehaviour
     private GameObject player;
 
     [SerializeField] private GameObject platformPrefab;
-    private int poolSize = 2;
     private Queue<Platform> platformPool = new();
 
     private Platform currentPlatform;
     private Platform nextPlatform;
-
-    private Animator animator;
 
     private void Start()
     {
@@ -28,29 +24,37 @@ public class PlatformManager : MonoBehaviour
     private void OnEnable()
     {
         EventHub.OnPlayerLanding += StartMovePlatform;
-        EventHub.OnPlayerJump += StartDespawnPlatform;
+        EventHub.OnPlayerJump += DespawnPlatform;
+        EventHub.OnGameOver += GameOver;
+        EventHub.OnRestart += Restart;
     }
 
     private void OnDisable()
     {
         EventHub.OnPlayerLanding -= StartMovePlatform;
-        EventHub.OnPlayerJump -= StartDespawnPlatform;
+        EventHub.OnPlayerJump -= DespawnPlatform;
+        EventHub.OnGameOver -= GameOver;
+        EventHub.OnRestart -= Restart;
     }
 
     private void OnDestroy()
     {
         EventHub.OnPlayerLanding -= StartMovePlatform;
-        EventHub.OnPlayerJump -= StartDespawnPlatform;
+        EventHub.OnPlayerJump -= DespawnPlatform;
+        EventHub.OnGameOver -= GameOver;
+        EventHub.OnRestart -= Restart;
     }
 
     // Creates a pool of platforms to use throughout the game
     private void CreatePool() 
     {
+        int poolSize = 2;
+
         for (int i = 0; i < poolSize; i++)
         {
             GameObject obj = Instantiate(platformPrefab);
             Platform platform = obj.GetComponent<Platform>();
-            platform.Despawn();
+            platform.gameObject.SetActive(false);
             platformPool.Enqueue(platform);
         }
     }
@@ -86,7 +90,7 @@ public class PlatformManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
-        Vector2 targetPos = new Vector2(currentPlatform.transform.position.x, 5.75f);
+        Vector2 targetPos = new(currentPlatform.transform.position.x, 5.75f);
         float speed = 15f;
 
         yield return StartCoroutine(currentPlatform.Move(targetPos, speed));
@@ -98,33 +102,35 @@ public class PlatformManager : MonoBehaviour
         PlayerManager.EnableInput();
     }
 
-    private void StartDespawnPlatform()
-    {
-        StartCoroutine(DespawnPlatform());
-    }
-
     // Despawns the platform the player jumped from
-    public IEnumerator DespawnPlatform() 
+    private void DespawnPlatform() 
     {
         if (currentPlatform.CompareTag("BPlatform"))
         {
-            Vector2 targetPos = new Vector2(currentPlatform.transform.position.x, -1);
-            float speed = 12f;
-
-            yield return StartCoroutine(currentPlatform.Move(targetPos, speed));
-
-            currentPlatform.Despawn();
+            MoveBottomPlatform(-1f);
         }
         else
         {
-            animator = currentPlatform.GetComponent<Animator>();
-            animator.SetTrigger("Despawn");
-
-            // Wait for the despawn animation to end
-            yield return new WaitForSeconds(0.096f);
-
-            currentPlatform.Despawn();
+            StartCoroutine(currentPlatform.Despawn());
             platformPool.Enqueue(currentPlatform);
         }
     }
+
+    private void MoveBottomPlatform(float targetYPos)
+    {
+        Vector2 targetPos = new(currentPlatform.transform.position.x, targetYPos);
+        float speed = 12f;
+
+        StartCoroutine(currentPlatform.Move(targetPos, speed));
+    }
+
+    private void GameOver()
+    {
+        StartCoroutine(nextPlatform.Despawn());
+    }
+
+    private void Restart()
+    {
+        MoveBottomPlatform(5.75f);
+    } 
 }

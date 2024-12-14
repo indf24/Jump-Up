@@ -25,19 +25,19 @@ public class PlayerManager : MonoBehaviour
 
     private void OnEnable()
     {
-        EventHub.OnPlatformCollision += PlatformCollision;
+        EventHub.OnPlatformCollision += StartPlatformCollision;
         EventHub.RunPlayerAnimation += PlayerAnimation;
     }
 
     private void OnDisable()
     {
-        EventHub.OnPlatformCollision -= PlatformCollision;
+        EventHub.OnPlatformCollision -= StartPlatformCollision;
         EventHub.RunPlayerAnimation -= PlayerAnimation;
     }
 
     private void OnDestroy()
     {
-        EventHub.OnPlatformCollision -= PlatformCollision;
+        EventHub.OnPlatformCollision -= StartPlatformCollision;
         EventHub.RunPlayerAnimation -= PlayerAnimation;
     }
 
@@ -64,37 +64,40 @@ public class PlayerManager : MonoBehaviour
     }
 
     // Creates a raycast for detection of contact between the player and a platform
-    private IEnumerator CreateGroudedRay()
+    private void CreateGroudedRay()
+    {
+        Vector2 rayOrigin = playerRb.position - new Vector2(0, (playerCollider.bounds.size.y / 2) + 0.002f);
+        float rayDistance = 0.1f;
+        hit = Physics2D.Raycast(rayOrigin, Vector2.down, rayDistance);
+
+        Debug.DrawRay(rayOrigin, Vector2.down * rayDistance, Color.red, 0.1f);
+    }
+
+    private void StartPlatformCollision()
+    {
+        StartCoroutine(PlatformCollision());
+    }
+
+    private IEnumerator PlatformCollision()
     {
         float duration = 1f;
         float elapsedTime = 0f;
 
         while (elapsedTime < duration)
         {
-            Vector2 rayOrigin = playerRb.position - new Vector2(0, (playerCollider.bounds.size.y / 2) + 0.002f);
-            float rayDistance = 0.1f;
-            hit = Physics2D.Raycast(rayOrigin, Vector2.down, rayDistance);
+            PlayerAnimation("Flying", false);
 
-            Debug.DrawRay(rayOrigin, Vector2.down * rayDistance, Color.red, 0.1f);
+            CreateGroudedRay();
 
-            yield return null;
+            if (IsGrounded())
+            {
+                StopMovement();
+                EventHub.PlayerLand(1);
+                yield break;
+            }
 
             elapsedTime += Time.deltaTime;
-        }
-    }
-
-    // Executes a sequence of events if the player is on top of a platform
-    private void PlatformCollision()
-    {
-        StartCoroutine(CreateGroudedRay());
-
-        animator.SetBool("Holding", false);
-        animator.SetBool("Flying", false);
-
-        if (IsGrounded())
-        {
-            StopMovement();
-            EventHub.PlayerLand(1);
+            yield return null;
         }
     }
 

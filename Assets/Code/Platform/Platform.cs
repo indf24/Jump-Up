@@ -13,8 +13,10 @@ public class Platform : MonoBehaviour
     private float ySpawnPosMin = 11.75f;
     private float ySpawnPosMax = 23.75f;
 
+    private Animator animator;
+
     // Gets a random position from SpawnPosition() and spawn the platform there
-    public void Spawn(float playerXPosition) 
+    public void Spawn(float playerXPosition)
     {
         gameObject.transform.position = SpawnPosition(playerXPosition);
         gameObject.SetActive(true);
@@ -54,9 +56,13 @@ public class Platform : MonoBehaviour
 
 
     // Despawns the platform
-    public void Despawn()
+    public IEnumerator Despawn()
     {
-        // Deactivates the platform
+        animator = gameObject.GetComponent<Animator>();
+        animator.SetTrigger("Despawn");
+
+        yield return new WaitForSeconds(0.096f);
+
         gameObject.SetActive(false);
     }
 

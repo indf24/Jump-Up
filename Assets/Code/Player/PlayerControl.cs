@@ -16,8 +16,6 @@ public class PlayerControl : MonoBehaviour
 
     private int trajectorySteps = 1000;
 
-    [SerializeField] private float a;
-
     private void Start()
     {
         player = GetComponent<Rigidbody2D>();
@@ -30,10 +28,9 @@ public class PlayerControl : MonoBehaviour
         {
             touch = Input.GetTouch(0);
             Vector2 jumpVector = CalculateJump(touch);
-            a = jumpVector.magnitude;
 
             // Enables the jump if its force is above a threshold
-            if (jumpVector.magnitude > minJumpForce)
+            if (jumpVector.y > minJumpForce)
             {
                 EventHub.PlayerAnimation("Holding", true);
 
@@ -51,6 +48,7 @@ public class PlayerControl : MonoBehaviour
                     PlayerManager.DisableInput();
                     EventHub.PlayerJump();
                     EventHub.PlayerAnimation("Flying", true);
+                    EventHub.PlayerAnimation("Holding", false);
                 }
             }
             else

@@ -10,7 +10,7 @@ public class EventHub : MonoBehaviour
     public static event Action<int> OnScoreEarned;
 
     public static event Action OnGameOver;
-    public static event Action OnRestart;
+    public static event Action OnRetry;
 
     public static event Action OnPlatformCollision;
 
@@ -43,8 +43,8 @@ public class EventHub : MonoBehaviour
         OnPlayerJump?.Invoke();
     }
 
-    public static void Restart()
+    public static void Retry()
     {
-        OnRestart?.Invoke();
+        OnRetry?.Invoke();
     }
 }

@@ -66,13 +66,19 @@ public class Platform : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public IEnumerator Move(Vector2 targetPos, float speed)
+    public IEnumerator Move(Vector2 targetPos, float duration)
     {
         while (Vector2.Distance(gameObject.transform.position, targetPos) > 0.01f)
         {
+            float speed = Vector2.Distance(gameObject.transform.position, targetPos) / duration;
+
             gameObject.transform.position = Vector2.MoveTowards(gameObject.transform.position, targetPos, speed * Time.deltaTime);
 
             yield return null;
+
+            duration -= Time.deltaTime;
         }
+
+        gameObject.transform.position = targetPos;
     }
 }

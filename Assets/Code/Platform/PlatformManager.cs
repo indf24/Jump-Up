@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 public class PlatformManager : MonoBehaviour
@@ -10,12 +11,14 @@ public class PlatformManager : MonoBehaviour
     [SerializeField] private GameObject platformPrefab;
     private Queue<Platform> platformPool = new();
 
+    private Platform bottomPlatform;
     private Platform currentPlatform;
     private Platform nextPlatform;
 
     private void Start()
     {
-        currentPlatform = GameObject.FindWithTag("BPlatform").GetComponent<Platform>();
+        bottomPlatform = GameObject.FindWithTag("BPlatform").GetComponent<Platform>();
+        currentPlatform = bottomPlatform;
         player = GameObject.Find("Player");
         CreatePool();
         SpawnPlatform();
@@ -26,7 +29,7 @@ public class PlatformManager : MonoBehaviour
         EventHub.OnPlayerLanding += StartMovePlatform;
         EventHub.OnPlayerJump += DespawnPlatform;
         EventHub.OnGameOver += GameOver;
-        EventHub.OnRestart += Restart;
+        EventHub.OnRetry += Restart;
     }
 
     private void OnDisable()
@@ -34,7 +37,7 @@ public class PlatformManager : MonoBehaviour
         EventHub.OnPlayerLanding -= StartMovePlatform;
         EventHub.OnPlayerJump -= DespawnPlatform;
         EventHub.OnGameOver -= GameOver;
-        EventHub.OnRestart -= Restart;
+        EventHub.OnRetry -= Restart;
     }
 
     private void OnDestroy()
@@ -42,7 +45,7 @@ public class PlatformManager : MonoBehaviour
         EventHub.OnPlayerLanding -= StartMovePlatform;
         EventHub.OnPlayerJump -= DespawnPlatform;
         EventHub.OnGameOver -= GameOver;
-        EventHub.OnRestart -= Restart;
+        EventHub.OnRetry -= Restart;
     }
 
     // Creates a pool of platforms to use throughout the game
@@ -91,9 +94,9 @@ public class PlatformManager : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
 
         Vector2 targetPos = new(currentPlatform.transform.position.x, 5.75f);
-        float speed = 15f;
+        float duration = 0.7f;
 
-        yield return StartCoroutine(currentPlatform.Move(targetPos, speed));
+        yield return StartCoroutine(currentPlatform.Move(targetPos, duration));
 
         player.transform.parent = null;
         player.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePositionX;
@@ -107,7 +110,7 @@ public class PlatformManager : MonoBehaviour
     {
         if (currentPlatform.CompareTag("BPlatform"))
         {
-            MoveBottomPlatform(-1f);
+            MoveBottomPlatform(-1f, 1f);
         }
         else
         {
@@ -116,12 +119,11 @@ public class PlatformManager : MonoBehaviour
         }
     }
 
-    private void MoveBottomPlatform(float targetYPos)
+    private void MoveBottomPlatform(float targetYPos, float duration)
     {
-        Vector2 targetPos = new(currentPlatform.transform.position.x, targetYPos);
-        float speed = 12f;
+        Vector2 targetPos = new(bottomPlatform.transform.position.x, targetYPos);
 
-        StartCoroutine(currentPlatform.Move(targetPos, speed));
+        StartCoroutine(bottomPlatform.Move(targetPos, duration));
     }
 
     private void GameOver()
@@ -131,6 +133,6 @@ public class PlatformManager : MonoBehaviour
 
     private void Restart()
     {
-        MoveBottomPlatform(5.75f);
+        MoveBottomPlatform(5.75f, 0.7f);
     } 
 }

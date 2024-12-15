@@ -5,34 +5,39 @@ public class ScoreManager : MonoBehaviour
 {
     private TextMeshProUGUI scoreText;
     private int score;
-    private int highScore;
+    private int highscore;
+
+    [SerializeField] private TextMeshProUGUI highscoreText;
 
     private void Start()
     {
-        highScore = PlayerPrefs.GetInt("HighScore", 0);
-        scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
+        highscore = PlayerPrefs.GetInt("Highscore", 0);
+        scoreText = GameObject.Find("PlayerScore").GetComponent<TextMeshProUGUI>();
     }
 
     private void OnEnable()
     {
         EventHub.OnScoreEarned += AddPoints;
-        EventHub.OnGameOver += UpdateHighScore;
+        EventHub.OnGameOver += UpdateHighscore;
+        EventHub.OnGameOver += UpdateUIHighscore;
     }
 
     private void OnDisable()
     {
         EventHub.OnScoreEarned -= AddPoints;
-        EventHub.OnGameOver -= UpdateHighScore;
+        EventHub.OnGameOver -= UpdateHighscore;
+        EventHub.OnGameOver -= UpdateUIHighscore;
     }
 
     private void OnDestroy()
     {
         EventHub.OnScoreEarned -= AddPoints;
-        EventHub.OnGameOver -= UpdateHighScore;
+        EventHub.OnGameOver -= UpdateHighscore;
+        EventHub.OnGameOver -= UpdateUIHighscore;
     }
 
     // Adds points to the score
-    public void AddPoints(int points)
+    private void AddPoints(int points)
     {
         score += points;
         UpdateScore();
@@ -45,12 +50,17 @@ public class ScoreManager : MonoBehaviour
     }
 
     // Update the high score on game over
-    public void UpdateHighScore()
+    private void UpdateHighscore()
     {
-        if (score > highScore)
+        if (score > highscore)
         {
-            highScore = score;
-            PlayerPrefs.SetInt("HighScore", highScore);
+            highscore = score;
+            PlayerPrefs.SetInt("Highscore", highscore);
         }
+    }
+
+    private void UpdateUIHighscore()
+    {
+        highscoreText.text = highscore.ToString();
     }
 }

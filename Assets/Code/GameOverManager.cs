@@ -11,12 +11,15 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private Button retryButton;
     [SerializeField] private Button menuButton;
 
-    [SerializeField] private TextMeshProUGUI playerScoreText;
-    [SerializeField] private TextMeshProUGUI playerScore;
-    [SerializeField] private TextMeshProUGUI highscoreText;
-    [SerializeField] private TextMeshProUGUI highscore;
+    [SerializeField] private GameObject currentScore;
+    [SerializeField] private GameObject scoreText;
+    [SerializeField] private GameObject finalScore;
+    [SerializeField] private GameObject bestText;
+    [SerializeField] private GameObject bestScore;
+    [SerializeField] private GameObject UIBall;
 
     [SerializeField] private GameObject ball;
+    [SerializeField] private GameObject platform;
 
     private void Start()
     {
@@ -26,64 +29,53 @@ public class GameOverManager : MonoBehaviour
 
     private IEnumerator GameOverScreen()
     {
-        yield return StartCoroutine(TurnPlayerObjectIntoUI());
+        StartCoroutine(ResetBall());
+        yield return new WaitForSeconds(0.8f);
         yield return StartCoroutine(ShowGameOverUI());
     }
 
     private IEnumerator Retry()
     {
         HideGameOverUI();
-        yield return StartCoroutine(ResetPlayerObject());
+        EventHub.Retry();
+        yield return new WaitForSeconds(0.7f);
 
         SceneControl.ReloadScene();
     }
 
-    private IEnumerator TurnPlayerObjectIntoUI()
+    private IEnumerator ResetBall()
     {
-        ball.GetComponent<Rigidbody2D>().simulated = false;
-        ball.GetComponent<CircleCollider2D>().enabled = false;
-
+        Rigidbody2D rb = ball.GetComponent<Rigidbody2D>();
         yield return new WaitForSeconds(1f);
-
-        yield return StartCoroutine(Move(ball, new(0f, 15f), 0.7f));
-        yield return StartCoroutine(Scale(ball, new(15f, 15f, 15f), 0.7f));
+        rb.velocity = Vector3.zero;
+        ball.transform.position = new Vector2(0, -1.25f);
+        ball.transform.parent = platform.transform;
     }
 
     private IEnumerator ShowGameOverUI()
     {
-        Color color = playerScoreText.color;
-        color.a = 1f;
+        currentScore.SetActive(false);
 
-        yield return StartCoroutine(TextColor(playerScoreText, color, 0.5f));
-        yield return StartCoroutine(MoveScore());
-        StartCoroutine(TextColor(highscoreText, color, 0.5f));
-        yield return StartCoroutine(TextColor(highscore, color, 0.5f));
-        yield return new WaitForSeconds(0.5f);
-        gameOverButtons.SetActive(true);
-    }
-
-    private IEnumerator MoveScore()
-    {
-        Color color = playerScoreText.color;
-
-        StartCoroutine(UIMove(playerScore.rectTransform, new(225f, 50f), 0.7f));
-        yield return StartCoroutine(TextColor(playerScore, color, 0.7f));
+        StartCoroutine(UIMove(scoreText, new(-375f, scoreText.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
+        yield return new WaitForSeconds(0.2f);
+        StartCoroutine(UIMove(finalScore, new(-350f, finalScore.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
+        yield return new WaitForSeconds(0.2f);
+        StartCoroutine(UIMove(bestText, new(-440f, bestText.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
+        yield return new WaitForSeconds(0.2f);
+        StartCoroutine(UIMove(bestScore, new(-425f, bestScore.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
+        yield return new WaitForSeconds(1f);
+        StartCoroutine(UIMove(UIBall, new(550, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
+        StartCoroutine(UIMove(gameOverButtons, new(405, gameOverButtons.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
     }
 
     private void HideGameOverUI()
     {
-        playerScoreText.gameObject.SetActive(false);
-        playerScore.gameObject.SetActive(false);
-        highscoreText.gameObject.SetActive(false);
-        highscore.gameObject.SetActive(false);
-        gameOverButtons.SetActive(false);
-    }
-
-    private IEnumerator ResetPlayerObject()
-    {
-        yield return StartCoroutine(Scale(ball, new(1f, 1f, 1f), 0.7f));
-        EventHub.Retry();
-        yield return StartCoroutine(Move(ball, new(0f, 6.5f), 0.7f));
+        scoreText.SetActive(false);
+        finalScore.SetActive(false);
+        bestText.SetActive(false);
+        bestScore.SetActive(false);
+        StartCoroutine(UIMove(UIBall, new(950, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
+        StartCoroutine(UIMove(gameOverButtons, new(805, gameOverButtons.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
     }
 
     private IEnumerator Move(GameObject obj, Vector2 targetPos, float duration)
@@ -104,8 +96,9 @@ public class GameOverManager : MonoBehaviour
         obj.transform.position = targetPos;
     }
 
-    private IEnumerator UIMove(RectTransform rectTransform, Vector2 targetPos, float duration)
+    private IEnumerator UIMove(GameObject obj, Vector2 targetPos, float duration)
     {
+        RectTransform rectTransform = obj.GetComponent<RectTransform>();
         Vector2 startPos = rectTransform.anchoredPosition;
 
         float elapsedTime = 0;

@@ -110,7 +110,7 @@ public class PlatformManager : MonoBehaviour
     {
         if (currentPlatform.CompareTag("BPlatform"))
         {
-            MoveBottomPlatform(-1f, 1f);
+            MoveBottomPlatform(-2f, 1f);
         }
         else
         {

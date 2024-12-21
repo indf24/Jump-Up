@@ -68,7 +68,7 @@ public class Platform : MonoBehaviour
 
     public IEnumerator Move(Vector2 targetPos, float duration)
     {
-        while (Vector2.Distance(gameObject.transform.position, targetPos) > 0.01f)
+        while (Vector2.Distance(gameObject.transform.position, targetPos) > 0.05f)
         {
             float speed = Vector2.Distance(gameObject.transform.position, targetPos) / duration;
 

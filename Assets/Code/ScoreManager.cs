@@ -12,7 +12,7 @@ public class ScoreManager : MonoBehaviour
     private void Start()
     {
         highscore = PlayerPrefs.GetInt("Highscore", 0);
-        scoreText = GameObject.Find("PlayerScore").GetComponent<TextMeshProUGUI>();
+        scoreText = GameObject.Find("CurrentScore").GetComponent<TextMeshProUGUI>();
     }
 
     private void OnEnable()

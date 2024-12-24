@@ -14,7 +14,7 @@ public class PlayerControl : MonoBehaviour
     private float minJumpForce = 600f;
     private float maxJumpForce = 1350f;
 
-    private int trajectorySteps = 1000;
+    private int maxTrajectorySteps = 20;
 
     private void Start()
     {
@@ -37,8 +37,9 @@ public class PlayerControl : MonoBehaviour
                 jumpVector = LimitJumpForce(jumpVector);
 
                 if (touch.phase is TouchPhase.Moved)
-                {              
-                    trajectoryManager.MakeTrajectory(touch, player, jumpVector, trajectorySteps);
+                {   
+                    float trajectorySteps = jumpVector.magnitude / ((maxJumpForce - minJumpForce) / maxTrajectorySteps);
+                    trajectoryManager.MakeTrajectory(touch, player, jumpVector, (int)trajectorySteps);
                 }
 
                 if (touch.phase is TouchPhase.Ended)
@@ -71,7 +72,7 @@ public class PlayerControl : MonoBehaviour
         {
             endTouchPosition = touch.position;
             jumpVector = startTouchPosition - endTouchPosition;
-            jumpVector = jumpVector.normalized * (jumpVector.magnitude + 300); //Change later
+            jumpVector = jumpVector.normalized * jumpVector.magnitude * 3; //Change later
         }
 
         return jumpVector;

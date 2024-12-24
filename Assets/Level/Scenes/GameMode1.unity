@@ -1437,6 +1437,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1344700869}
   - {fileID: 1980430214}
   - {fileID: 533964046}
   - {fileID: 2144763468}
@@ -1630,7 +1631,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 74eb5a056b5f5b44883926ef506e71d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  highscoreText: {fileID: 1667886688}
+  currentScore: {fileID: 1150628286}
+  finalScore: {fileID: 1551323110}
+  bestScore: {fileID: 1667886688}
 --- !u!1 &1150628283
 GameObject:
   m_ObjectHideFlags: 0
@@ -1957,7 +1960,7 @@ GameObject:
   - component: {fileID: 1344700866}
   - component: {fileID: 1344700870}
   m_Layer: 0
-  m_Name: GameOverTrigger
+  m_Name: GameOverManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2106,12 +2109,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1344700865}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.5154558, y: -4.615896, z: -0.20727856}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 710857498}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1344700870
 MonoBehaviour:
@@ -2129,11 +2132,12 @@ MonoBehaviour:
   retryButton: {fileID: 652507403}
   menuButton: {fileID: 259347219}
   currentScore: {fileID: 1150628283}
-  scoreText: {fileID: 1328288732}
-  finalScore: {fileID: 1551323107}
-  bestText: {fileID: 1349914377}
-  bestScore: {fileID: 1667886686}
   UIBall: {fileID: 302425058}
+  uiElements:
+  - {fileID: 1328288732}
+  - {fileID: 1551323107}
+  - {fileID: 1349914377}
+  - {fileID: 1667886686}
   ball: {fileID: 533233902}
   platform: {fileID: 782851484}
 --- !u!1 &1349914377
@@ -2431,7 +2435,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 500
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fee7d940c7d0a354ba34c4b1d259efde, type: 2}
   m_sharedMaterial: {fileID: -6722457135147094949, guid: fee7d940c7d0a354ba34c4b1d259efde, type: 2}
@@ -2565,7 +2569,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 780
+  m_text: 0
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: fee7d940c7d0a354ba34c4b1d259efde, type: 2}
   m_sharedMaterial: {fileID: -6722457135147094949, guid: fee7d940c7d0a354ba34c4b1d259efde, type: 2}
@@ -2741,5 +2745,4 @@ SceneRoots:
   - {fileID: 710857498}
   - {fileID: 1382065687}
   - {fileID: 305327084}
-  - {fileID: 1344700869}
   - {fileID: 1291561426}

@@ -3,37 +3,37 @@ using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
-    private TextMeshProUGUI scoreText;
+    [SerializeField] private TextMeshProUGUI currentScore;
     private int score;
     private int highscore;
 
-    [SerializeField] private TextMeshProUGUI highscoreText;
+    [SerializeField] private TextMeshProUGUI finalScore;
+    [SerializeField] private TextMeshProUGUI bestScore;
 
     private void Start()
     {
         highscore = PlayerPrefs.GetInt("Highscore", 0);
-        scoreText = GameObject.Find("CurrentScore").GetComponent<TextMeshProUGUI>();
     }
 
     private void OnEnable()
     {
         EventHub.OnScoreEarned += AddPoints;
         EventHub.OnGameOver += UpdateHighscore;
-        EventHub.OnGameOver += UpdateUIHighscore;
+        EventHub.OnGameOver += UpdateGameOverScores;
     }
 
     private void OnDisable()
     {
         EventHub.OnScoreEarned -= AddPoints;
         EventHub.OnGameOver -= UpdateHighscore;
-        EventHub.OnGameOver -= UpdateUIHighscore;
+        EventHub.OnGameOver -= UpdateGameOverScores;
     }
 
     private void OnDestroy()
     {
         EventHub.OnScoreEarned -= AddPoints;
         EventHub.OnGameOver -= UpdateHighscore;
-        EventHub.OnGameOver -= UpdateUIHighscore;
+        EventHub.OnGameOver -= UpdateGameOverScores;
     }
 
     // Adds points to the score
@@ -46,7 +46,7 @@ public class ScoreManager : MonoBehaviour
     // Updates the score counter in the screen
     private void UpdateScore()
     {
-        scoreText.text = score.ToString();
+        currentScore.text = score.ToString();
     }
 
     // Update the high score on game over
@@ -59,8 +59,9 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    private void UpdateUIHighscore()
+    private void UpdateGameOverScores()
     {
-        highscoreText.text = highscore.ToString();
+        finalScore.text = score.ToString();
+        bestScore.text = highscore.ToString();
     }
 }

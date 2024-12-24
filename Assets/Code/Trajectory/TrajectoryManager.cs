@@ -80,7 +80,7 @@ public class TrajectoryManager : MonoBehaviour
     // Places the trajectory dots
     private void DrawTrajectory(List<Vector2> trajectoryPoints)
     {
-        int sampleRate = 10;
+        int sampleRate = 1;
 
         for (int i = 0; i < trajectoryPoints.Count; i += sampleRate)
         {

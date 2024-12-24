@@ -34,7 +34,7 @@ public class GameSettings : MonoBehaviour
 
     private void ApplyGameSettings()
     {
-        Application.targetFrameRate = 400;
+        Application.targetFrameRate = 60;
         QualitySettings.vSyncCount = 0;
         Screen.SetResolution(1080, 1920, true);
     }

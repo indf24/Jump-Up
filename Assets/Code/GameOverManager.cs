@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,11 +11,13 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private Button menuButton;
 
     [SerializeField] private GameObject currentScore;
-    [SerializeField] private GameObject scoreText;
-    [SerializeField] private GameObject finalScore;
-    [SerializeField] private GameObject bestText;
-    [SerializeField] private GameObject bestScore;
     [SerializeField] private GameObject UIBall;
+
+    [SerializeField] private GameObject[] uiElements; // Drag UI elements here in the Inspector
+    private List<float> targetPositionsEnter = new() { -375f, -350f, -440f, -425f };
+    private List<float> targetPositionsLeave = new() { -715f, -690f, -780f, -765 };
+    private List<float> delays = new() { 0.2f, 0.2f, 0.2f, 1f };
+    private float moveDuration = 0.5f;
 
     [SerializeField] private GameObject ball;
     [SerializeField] private GameObject platform;
@@ -30,6 +31,7 @@ public class GameOverManager : MonoBehaviour
     private IEnumerator GameOverScreen()
     {
         StartCoroutine(ResetBall());
+        StartCoroutine(UIMove(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000), 0.5f));
         yield return new WaitForSeconds(0.8f);
         yield return StartCoroutine(ShowGameOverUI());
     }
@@ -47,33 +49,31 @@ public class GameOverManager : MonoBehaviour
     {
         Rigidbody2D rb = ball.GetComponent<Rigidbody2D>();
         yield return new WaitForSeconds(1f);
-        rb.velocity = Vector3.zero;
+        rb.velocity = Vector2.zero;
+        rb.constraints |= RigidbodyConstraints2D.FreezeRotation;
         ball.transform.position = new Vector2(0, -1.25f);
         ball.transform.parent = platform.transform;
     }
 
     private IEnumerator ShowGameOverUI()
     {
-        currentScore.SetActive(false);
+        for (int i = 0; i < uiElements.Length; i++)
+        {
+            StartCoroutine(UIMove(uiElements[i], new(targetPositionsEnter[i], uiElements[i].GetComponent<RectTransform>().anchoredPosition.y), moveDuration));
+            yield return new WaitForSeconds(delays[i]);
+        }
 
-        StartCoroutine(UIMove(scoreText, new(-375f, scoreText.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
-        yield return new WaitForSeconds(0.2f);
-        StartCoroutine(UIMove(finalScore, new(-350f, finalScore.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
-        yield return new WaitForSeconds(0.2f);
-        StartCoroutine(UIMove(bestText, new(-440f, bestText.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
-        yield return new WaitForSeconds(0.2f);
-        StartCoroutine(UIMove(bestScore, new(-425f, bestScore.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
-        yield return new WaitForSeconds(1f);
         StartCoroutine(UIMove(UIBall, new(550, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
         StartCoroutine(UIMove(gameOverButtons, new(405, gameOverButtons.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
     }
 
     private void HideGameOverUI()
     {
-        scoreText.SetActive(false);
-        finalScore.SetActive(false);
-        bestText.SetActive(false);
-        bestScore.SetActive(false);
+        for (int i = 0; i < uiElements.Length; i++)
+        {
+            StartCoroutine(UIMove(uiElements[i], new(targetPositionsLeave[i], uiElements[i].GetComponent<RectTransform>().anchoredPosition.y), moveDuration));
+        }
+
         StartCoroutine(UIMove(UIBall, new(950, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
         StartCoroutine(UIMove(gameOverButtons, new(805, gameOverButtons.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
     }

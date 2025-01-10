@@ -4,7 +4,7 @@ public class PlayerControl : MonoBehaviour
 {
     [SerializeField] private TrajectoryManager trajectoryManager;
 
-    private Rigidbody2D player;
+    [SerializeField] private Rigidbody2D player;
 
     Touch touch = new();
 
@@ -15,11 +15,6 @@ public class PlayerControl : MonoBehaviour
     private float maxJumpForce = 1350f;
 
     private int maxTrajectorySteps = 20;
-
-    private void Start()
-    {
-        player = GetComponent<Rigidbody2D>();
-    }
 
     // Manages the entire player control by detecting screen touch
     void Update()
@@ -93,6 +88,8 @@ public class PlayerControl : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Platform"))
         {
+            EventHub.PlayerAnimation("Holding", false);
+            EventHub.PlayerAnimation("Flying", false);
             EventHub.PlatformCollision();
         }
     }

@@ -18,7 +18,6 @@ public class SceneControl : MonoBehaviour
     // Reloads the current scene
     public static void ReloadScene()
     {
-        PlayerManager.DisableInput();
         Scene scene = SceneManager.GetActiveScene();
         SceneManager.LoadScene(scene.name);
     }
@@ -27,7 +26,6 @@ public class SceneControl : MonoBehaviour
     // Loads a scene
     public static void LoadScene(string sceneName)
     {
-        PlayerManager.DisableInput();
         SceneManager.LoadScene(sceneName);
     }
 

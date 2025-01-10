@@ -1,27 +1,17 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
-    private Rigidbody2D playerRb;
-    private Collider2D playerCollider;
-    private Transform sprite;
-    private Animator animator;
+    [SerializeField] private Rigidbody2D playerRb;
+    [SerializeField] private Collider2D playerCollider;
+    [SerializeField] private Transform sprite;
+    [SerializeField] private Animator animator;
 
     private static bool playerInputAllowed = false;
     public static bool PlayerInputAllowed => playerInputAllowed;
 
     private RaycastHit2D hit;
-
-    private void Start()
-    {
-        GameObject player = GameObject.Find("Player");
-        playerRb = player.GetComponent<Rigidbody2D>();
-        playerCollider = player.GetComponent<CircleCollider2D>();
-        sprite = player.transform.GetChild(1);
-        animator = sprite.GetComponent<Animator>();
-    }
 
     private void OnEnable()
     {

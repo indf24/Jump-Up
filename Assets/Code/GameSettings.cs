@@ -8,6 +8,8 @@ public class GameSettings : MonoBehaviour
 
     private void Awake()
     {
+        ApplyGameSettings();
+
         if (instance != null && instance != this)
         {
             Destroy(gameObject); // Destroy any duplicate instances

@@ -1,25 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 public class PlatformManager : MonoBehaviour
 {
-    private GameObject player;
+    [SerializeField] private GameObject player;
 
     [SerializeField] private GameObject platformPrefab;
     private Queue<Platform> platformPool = new();
 
-    private Platform bottomPlatform;
+    [SerializeField] private Platform bottomPlatform;
     private Platform currentPlatform;
     private Platform nextPlatform;
 
+    private bool MovePlatformActive = false;
+
     private void Start()
     {
-        bottomPlatform = GameObject.FindWithTag("BPlatform").GetComponent<Platform>();
         currentPlatform = bottomPlatform;
-        player = GameObject.Find("Player");
         CreatePool();
         SpawnPlatform();
     }
@@ -80,12 +79,17 @@ public class PlatformManager : MonoBehaviour
 
     private void StartMovePlatform()
     {
-        StartCoroutine(MovePlatform());
+        if (!MovePlatformActive)
+        {
+            StartCoroutine(MovePlatform());
+        }
     }
 
     // Moves the platfrom where the player land downwards to a predefined position
     public IEnumerator MovePlatform() 
     {
+        MovePlatformActive = true;
+
         currentPlatform = nextPlatform;
 
         // Makes the player a child object of the current platform to make them move together
@@ -96,34 +100,31 @@ public class PlatformManager : MonoBehaviour
         Vector2 targetPos = new(currentPlatform.transform.position.x, 5.75f);
         float duration = 0.7f;
 
-        yield return StartCoroutine(currentPlatform.Move(targetPos, duration));
+        currentPlatform.Move(targetPos, duration);
+        yield return new WaitForSeconds(duration);
 
         player.transform.parent = null;
         player.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePositionX;
 
         SpawnPlatform();
         PlayerManager.EnableInput();
+
+        MovePlatformActive = false;
     }
 
     // Despawns the platform the player jumped from
     private void DespawnPlatform() 
     {
-        if (currentPlatform.CompareTag("BPlatform"))
+        if (currentPlatform == bottomPlatform)
         {
-            MoveBottomPlatform(-2f, 1f);
+            Vector2 targetPos = new(bottomPlatform.transform.position.x, -2f);
+            bottomPlatform.Move(targetPos, 0.7f);
         }
         else
         {
             StartCoroutine(currentPlatform.Despawn());
             platformPool.Enqueue(currentPlatform);
         }
-    }
-
-    private void MoveBottomPlatform(float targetYPos, float duration)
-    {
-        Vector2 targetPos = new(bottomPlatform.transform.position.x, targetYPos);
-
-        StartCoroutine(bottomPlatform.Move(targetPos, duration));
     }
 
     private void GameOver()
@@ -133,6 +134,7 @@ public class PlatformManager : MonoBehaviour
 
     private void Restart()
     {
-        MoveBottomPlatform(5.75f, 0.7f);
+        Vector2 targetPos = new(bottomPlatform.transform.position.x, 5.75f);
+        bottomPlatform.Move(targetPos, 0.7f);
     } 
 }

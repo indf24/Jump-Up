@@ -13,11 +13,14 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private GameObject currentScore;
     [SerializeField] private GameObject UIBall;
 
-    [SerializeField] private GameObject[] uiElements; // Drag UI elements here in the Inspector
+    [SerializeField] private List<GameObject> gameElements;
     private List<float> targetPositionsEnter = new() { -375f, -350f, -440f, -425f };
     private List<float> targetPositionsLeave = new() { -715f, -690f, -780f, -765 };
-    private List<float> delays = new() { 0.2f, 0.2f, 0.2f, 1f };
+    private List<float> delays = new() { 0.2f, 0.2f, 0.2f, 0.6f };
     private float moveDuration = 0.5f;
+
+    [SerializeField] private List<GameObject> menuElements;
+    [SerializeField] private TextMeshProUGUI playText;
 
     [SerializeField] private GameObject ball;
     [SerializeField] private GameObject platform;
@@ -25,13 +28,13 @@ public class GameOverManager : MonoBehaviour
     private void Start()
     {
         retryButton.onClick.AddListener(() => StartCoroutine(Retry()));
-        menuButton.onClick.AddListener(() => SceneControl.LoadScene("MainMenu"));
+        menuButton.onClick.AddListener(() => Menu());
     }
 
     private IEnumerator GameOverScreen()
     {
         StartCoroutine(ResetBall());
-        StartCoroutine(UIMove(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000), 0.5f));
+        StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000), 0.5f, "ease", true));
         yield return new WaitForSeconds(0.8f);
         yield return StartCoroutine(ShowGameOverUI());
     }
@@ -39,10 +42,17 @@ public class GameOverManager : MonoBehaviour
     private IEnumerator Retry()
     {
         HideGameOverUI();
+        StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 850), 0.7f, isCanvasObject:true));
         EventHub.Retry();
-        yield return new WaitForSeconds(0.7f);
+        yield return new WaitForSeconds(0.8f);
 
         SceneControl.ReloadScene();
+    }
+
+    private void Menu()
+    {
+        HideGameOverUI();
+        StartCoroutine(LoadMenu());
     }
 
     private IEnumerator ResetBall()
@@ -57,100 +67,46 @@ public class GameOverManager : MonoBehaviour
 
     private IEnumerator ShowGameOverUI()
     {
-        for (int i = 0; i < uiElements.Length; i++)
+        for (int i = 0; i < gameElements.Count; i++)
         {
-            StartCoroutine(UIMove(uiElements[i], new(targetPositionsEnter[i], uiElements[i].GetComponent<RectTransform>().anchoredPosition.y), moveDuration));
+            StartCoroutine(Utils.MoveObject(gameElements[i], new(targetPositionsEnter[i], gameElements[i].GetComponent<RectTransform>().anchoredPosition.y), moveDuration, "ease", true));
             yield return new WaitForSeconds(delays[i]);
         }
 
-        StartCoroutine(UIMove(UIBall, new(550, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
-        StartCoroutine(UIMove(gameOverButtons, new(405, gameOverButtons.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
+        StartCoroutine(Utils.MoveObject(UIBall, new(600f, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, "ease", true));
+        StartCoroutine(Utils.MoveObject(gameOverButtons, new(422.5f, gameOverButtons.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, "ease", true));
     }
 
     private void HideGameOverUI()
     {
-        for (int i = 0; i < uiElements.Length; i++)
+        for (int i = 0; i < gameElements.Count; i++)
         {
-            StartCoroutine(UIMove(uiElements[i], new(targetPositionsLeave[i], uiElements[i].GetComponent<RectTransform>().anchoredPosition.y), moveDuration));
+            StartCoroutine(Utils.MoveObject(gameElements[i], new(targetPositionsLeave[i], gameElements[i].GetComponent<RectTransform>().anchoredPosition.y), moveDuration, "ease", true));
         }
 
-        StartCoroutine(UIMove(UIBall, new(950, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
-        StartCoroutine(UIMove(gameOverButtons, new(805, gameOverButtons.GetComponent<RectTransform>().anchoredPosition.y), 0.5f));
+        StartCoroutine(Utils.MoveObject(UIBall, new(950f, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, "ease", true));
+        StartCoroutine(Utils.MoveObject(gameOverButtons, new(772.5f, gameOverButtons.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, "ease", true));
     }
 
-    private IEnumerator Move(GameObject obj, Vector2 targetPos, float duration)
+    private IEnumerator LoadMenu()
     {
-        Vector2 startPos = obj.transform.position;
+        StartCoroutine(Utils.ChangeOpacityOverTime(playText, 1f, 0.7f));
 
-        float elapsedTime = 0;
+        List<float> targetYPos = new() { 20f, -80f };
+        List<float> duration = new() { 0.7f, 0.2f };
 
-        while (elapsedTime < duration)
+        for (int i = 0; i < menuElements.Count; i++)
         {
-            elapsedTime += Time.deltaTime;
-            float t = elapsedTime / duration;
-            float easeT = 1 - Mathf.Pow(1 - t, 3);
-            obj.transform.position = Vector2.Lerp(startPos, targetPos, easeT);
-            yield return null;
+            StartCoroutine(Utils.MoveObject(menuElements[i],
+                new(i == 1 ? menuElements[i].GetComponent<RectTransform>().anchoredPosition.x : menuElements[i].transform.position.x,
+                targetYPos[i]), duration[i],
+                isCanvasObject: i == 1));
         }
 
-        obj.transform.position = targetPos;
+        yield return new WaitForSeconds(0.7f);
+
+        SceneControl.LoadScene("MainMenu");
     }
-
-    private IEnumerator UIMove(GameObject obj, Vector2 targetPos, float duration)
-    {
-        RectTransform rectTransform = obj.GetComponent<RectTransform>();
-        Vector2 startPos = rectTransform.anchoredPosition;
-
-        float elapsedTime = 0;
-
-        while (elapsedTime < duration)
-        {
-            elapsedTime += Time.deltaTime;
-            float t = elapsedTime / duration;
-            float easeT = 1 - Mathf.Pow(1 - t, 3); // Cubic ease-out
-            rectTransform.anchoredPosition = Vector2.Lerp(startPos, targetPos, easeT);
-            yield return null;
-        }
-
-        rectTransform.anchoredPosition = targetPos;
-    }
-
-    private IEnumerator Scale(GameObject obj, Vector3 targetScale, float duration)
-    {
-        Vector3 startScale = obj.transform.localScale;
-
-        float elapsedTime = 0;
-
-        while (elapsedTime < duration)
-        {
-            elapsedTime += Time.deltaTime;
-            float t = elapsedTime / duration;
-            float easeT = 1 - Mathf.Pow(1 - t, 3);
-            obj.transform.localScale = Vector3.Lerp(startScale, targetScale, easeT);
-            yield return null;
-        }
-
-        obj.transform.localScale = targetScale;
-    }
-
-    private IEnumerator TextColor(TextMeshProUGUI text, Color targetColor, float duration)
-    {
-        Color startColor = text.color;
-        float elapsedTime = 0f;
-
-        while (elapsedTime < duration)
-        {
-            elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / duration);
-
-            text.color = Color.Lerp(startColor, targetColor, t);
-
-            yield return null;
-        }
-
-        text.color = targetColor;
-    }
-
 
     // Shows the game over screen on game over
     private void OnTriggerEnter2D(Collider2D collision)

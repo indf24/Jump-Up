@@ -117,9 +117,8 @@ public class PlatformManager : MonoBehaviour
     {
         if (currentPlatform == bottomPlatform)
         {
-            Vector2 targetPos = new(bottomPlatform.transform.position.x, -2f);
-            bottomPlatform.Move(targetPos, 0.7f);
-        }
+            StartCoroutine(MoveBottomPlatform());
+        }   
         else
         {
             StartCoroutine(currentPlatform.Despawn());
@@ -127,9 +126,18 @@ public class PlatformManager : MonoBehaviour
         }
     }
 
+    private IEnumerator MoveBottomPlatform()
+    {
+        Vector2 targetPos = new(bottomPlatform.transform.position.x, -2f);
+        bottomPlatform.Move(targetPos, 0.7f);
+        yield return new WaitForSeconds(0.7f);
+        bottomPlatform.gameObject.SetActive(false);
+    }
+
     private void GameOver()
     {
         StartCoroutine(nextPlatform.Despawn());
+        bottomPlatform.gameObject.SetActive(true);
     }
 
     private void Restart()

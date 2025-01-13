@@ -34,7 +34,7 @@ public class GameOverManager : MonoBehaviour
     private IEnumerator GameOverScreen()
     {
         StartCoroutine(ResetBall());
-        StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000), 0.5f, "ease", true));
+        StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000f), 0.5f, "ease", true));
         yield return new WaitForSeconds(0.8f);
         yield return StartCoroutine(ShowGameOverUI());
     }
@@ -42,7 +42,7 @@ public class GameOverManager : MonoBehaviour
     private IEnumerator Retry()
     {
         HideGameOverUI();
-        StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 850), 0.7f, isCanvasObject:true));
+        StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 850f), 0.7f, isCanvasObject:true));
         EventHub.Retry();
         yield return new WaitForSeconds(0.8f);
 
@@ -61,7 +61,7 @@ public class GameOverManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         rb.velocity = Vector2.zero;
         rb.constraints |= RigidbodyConstraints2D.FreezeRotation;
-        ball.transform.position = new Vector2(0, -1.25f);
+        ball.transform.position = new Vector2(0f, -1.25f);
         ball.transform.parent = platform.transform;
     }
 
@@ -90,8 +90,6 @@ public class GameOverManager : MonoBehaviour
 
     private IEnumerator LoadMenu()
     {
-        StartCoroutine(Utils.ChangeOpacityOverTime(playText, 1f, 0.7f));
-
         List<float> targetYPos = new() { 20f, -80f };
         List<float> duration = new() { 0.7f, 0.2f };
 
@@ -101,9 +99,16 @@ public class GameOverManager : MonoBehaviour
                 new(i == 1 ? menuElements[i].GetComponent<RectTransform>().anchoredPosition.x : menuElements[i].transform.position.x,
                 targetYPos[i]), duration[i],
                 isCanvasObject: i == 1));
+
+            if (i == 0)
+            {
+                yield return new WaitForSeconds(0.5f);
+            }
         }
 
-        yield return new WaitForSeconds(0.7f);
+        StartCoroutine(Utils.ChangeOpacityOverTime(playText, 1f, 0.2f));
+
+        yield return new WaitForSeconds(0.2f);
 
         SceneControl.LoadScene("MainMenu");
     }

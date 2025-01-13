@@ -11,10 +11,8 @@ public class PlayerControl : MonoBehaviour
     private Vector2 startTouchPosition;
     private Vector2 endTouchPosition;
 
-    private float minJumpForce = 600f;
-    private float maxJumpForce = 1350f;
-
-    private int maxTrajectorySteps = 20;
+    private int minJumpForce = 600;
+    private int maxJumpForce = 1350;
 
     // Manages the entire player control by detecting screen touch
     void Update()
@@ -33,8 +31,7 @@ public class PlayerControl : MonoBehaviour
 
                 if (touch.phase is TouchPhase.Moved)
                 {   
-                    float trajectorySteps = jumpVector.magnitude / ((maxJumpForce - minJumpForce) / maxTrajectorySteps);
-                    trajectoryManager.MakeTrajectory(touch, player, jumpVector, (int)trajectorySteps);
+                    trajectoryManager.MakeTrajectory(player, jumpVector, minJumpForce, maxJumpForce);
                 }
 
                 if (touch.phase is TouchPhase.Ended)

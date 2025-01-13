@@ -13,6 +13,8 @@ public class MainMenuManager : MonoBehaviour
     private Coroutine blinkingPlayText;
     private bool start = true;
 
+    private Vector2 startTouchPosition;
+
     private void Start()
     {
         blinkingPlayText = StartCoroutine(Utils.BlinkText(playText, 1f));
@@ -24,9 +26,18 @@ public class MainMenuManager : MonoBehaviour
         {
             Touch touch = Input.GetTouch(0);
 
-            if (touch.phase is TouchPhase.Moved)
+            if (touch.phase is TouchPhase.Began)
             {
-                start = false;
+                startTouchPosition = touch.position;
+            }
+            else if (touch.phase is not TouchPhase.Ended)
+            {
+                Vector2 endTouchPosition = touch.position;
+
+                if (Vector2.Distance(startTouchPosition, endTouchPosition) > 15f && start)
+                {
+                    start = false;
+                }
             }
 
             if (touch.phase is TouchPhase.Ended)

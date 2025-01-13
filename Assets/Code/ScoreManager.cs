@@ -20,6 +20,7 @@ public class ScoreManager : MonoBehaviour
         EventHub.OnScoreEarned += AddPoints;
         EventHub.OnGameOver += UpdateHighscore;
         EventHub.OnGameOver += UpdateGameOverScores;
+        EventHub.OnRetry += ResetCurrentScore;
     }
 
     private void OnDisable()
@@ -27,6 +28,7 @@ public class ScoreManager : MonoBehaviour
         EventHub.OnScoreEarned -= AddPoints;
         EventHub.OnGameOver -= UpdateHighscore;
         EventHub.OnGameOver -= UpdateGameOverScores;
+        EventHub.OnRetry -= ResetCurrentScore;
     }
 
     private void OnDestroy()
@@ -34,6 +36,7 @@ public class ScoreManager : MonoBehaviour
         EventHub.OnScoreEarned -= AddPoints;
         EventHub.OnGameOver -= UpdateHighscore;
         EventHub.OnGameOver -= UpdateGameOverScores;
+        EventHub.OnRetry -= ResetCurrentScore;
     }
 
     // Adds points to the score
@@ -63,5 +66,10 @@ public class ScoreManager : MonoBehaviour
     {
         finalScore.text = score.ToString();
         bestScore.text = highscore.ToString();
+    }
+
+    private void ResetCurrentScore()
+    {
+        currentScore.text = "0";
     }
 }

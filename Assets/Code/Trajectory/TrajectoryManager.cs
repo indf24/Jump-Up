@@ -10,6 +10,7 @@ public class TrajectoryManager : MonoBehaviour
     [SerializeField] private GameObject trajectoryDotPrefab;
     private int poolSize = 100;
     private Queue<TrajectoryDot> trajectoryDotPool = new();
+    private int maxTrajectorySteps = 6;
 
     private void Start()
     {
@@ -44,45 +45,43 @@ public class TrajectoryManager : MonoBehaviour
     }
 
     // Creates a new trajectory when needed
-    public void MakeTrajectory(Touch touch, Rigidbody2D rigidbody, Vector2 jumpVector, int steps)
+    public void MakeTrajectory(Rigidbody2D rigidbody, Vector2 jumpVector, int minJumpForce, int maxJumpForce)
     {
-        if (touch.phase is TouchPhase.Moved)
-        {
-            DespawnDots();
-            List<Vector2> trajectoryPoints = CalculateTrajectory(rigidbody, (Vector2)rigidbody.transform.position, jumpVector, steps);
-            DrawTrajectory(trajectoryPoints);
-        }
+        float steps = maxTrajectorySteps * ((jumpVector.y - minJumpForce) / (maxJumpForce - minJumpForce));
+
+        DespawnDots();
+        List<Vector2> trajectoryPoints = CalculateTrajectory(rigidbody.transform.position, jumpVector);
+        DrawTrajectory(trajectoryPoints, steps);
     }
 
     // Calculates where the trajectory dots should be placed
-    private List<Vector2> CalculateTrajectory(Rigidbody2D rigidbody, Vector2 pos, Vector2 dragVector, int steps)
+    private List<Vector2> CalculateTrajectory(Vector2 startPos, Vector2 jumpVector)
     {
         List<Vector2> points = new();
 
-        float timestep = Time.fixedDeltaTime / Physics2D.velocityIterations;
-        Vector2 gravityAcceleration = rigidbody.gravityScale * timestep * timestep * Physics2D.gravity;
+        // Fixed trajectory length
+        float totalLength = 5f;
 
-        float drag = 1f - (timestep * rigidbody.drag);
-        Vector2 moveStep = dragVector / rigidbody.mass * timestep;
+        // Calculate the normalized direction
+        Vector2 normalizedDirection = jumpVector.normalized;
 
-        for (int i = 0; i < steps; i++)
+        // Place dots progressively along the trajectory length
+        for (int i = 0; i < maxTrajectorySteps; i++)
         {
-            moveStep += gravityAcceleration;
-            moveStep *= drag;
-            pos += moveStep;
-
-            points.Add(pos);
+            Vector2 point = startPos + normalizedDirection * (totalLength / maxTrajectorySteps * i);
+            points.Add(point);
         }
 
         return points;
     }
 
+
     // Places the trajectory dots
-    private void DrawTrajectory(List<Vector2> trajectoryPoints)
+    private void DrawTrajectory(List<Vector2> trajectoryPoints, float steps)
     {
         int sampleRate = 1;
 
-        for (int i = 0; i < trajectoryPoints.Count; i += sampleRate)
+        for (int i = 0; i < steps; i += sampleRate)
         {
             TrajectoryDot dot = SpawnDot(trajectoryPoints[i]);
             dot.transform.parent = transform;

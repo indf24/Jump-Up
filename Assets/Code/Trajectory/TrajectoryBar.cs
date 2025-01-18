@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class TrajectoryDot : MonoBehaviour
+public class TrajectoryBar : MonoBehaviour
 {
     // Spawns a dot
     public void Spawn(Vector2 spawnPosition)

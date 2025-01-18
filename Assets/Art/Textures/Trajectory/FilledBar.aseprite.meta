@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: e745f91723ba42e439295002dadb936c
+guid: 68f7003a4c7a35a46b88cd1d51b8f81c
 ScriptedImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -35,7 +35,7 @@ ScriptedImporter:
     spriteMeshType: 1
     alignment: 0
     spritePivot: {x: 0.5, y: 0.5}
-    spritePixelsToUnits: 10
+    spritePixelsToUnits: 16
     spriteBorder: {x: 0, y: 0, z: 0, w: 0}
     spriteGenerateFallbackPhysicsShape: 0
     generateCubemap: 6
@@ -75,7 +75,7 @@ ScriptedImporter:
     importHiddenLayers: 0
     layerImportMode: 1
     defaultPivotSpace: 0
-    defaultPivotAlignment: 7
+    defaultPivotAlignment: 0
     customPivotPosition: {x: 0.5, y: 0.5}
     mosaicPadding: 4
     spritePadding: 0
@@ -88,7 +88,7 @@ ScriptedImporter:
     importHiddenLayers: 0
     layerImportMode: 1
     defaultPivotSpace: 0
-    defaultPivotAlignment: 7
+    defaultPivotAlignment: 0
     customPivotPosition: {x: 0.5, y: 0.5}
     mosaicPadding: 4
     spritePadding: 0
@@ -97,7 +97,7 @@ ScriptedImporter:
     addSortingGroup: 1
     addShadowCasters: 0
   importFileNodeState: 1
-  platformSettingsDirtyTick: 638531321487633619
+  platformSettingsDirtyTick: 638724783697301357
   textureAssetName: 
   singleSpriteImportData:
   - name: 
@@ -121,18 +121,18 @@ ScriptedImporter:
     tessellationDetail: 0
     uvTransform: {x: 0, y: 0}
   animatedSpriteImportData:
-  - name: TrajectoryDot
+  - name: FilledBar
     originalName: 
     pivot: {x: 0.5, y: 0.5}
-    alignment: 0
+    alignment: 9
     border: {x: 0, y: 0, z: 0, w: 0}
     rect:
       serializedVersion: 2
       x: 4
       y: 4
-      width: 7
-      height: 7
-    spriteID: 895be0bd149f3fe45a164c8a81bdf7b9
+      width: 12
+      height: 4
+    spriteID: b2861e7ee38ef0f4488cad798110e24e
     spriteBone: []
     spriteOutline: []
     vertices: []
@@ -144,24 +144,36 @@ ScriptedImporter:
   spriteSheetImportData: []
   asepriteLayers:
   - layerIndex: 0
-    guid: 1547584814
-    name: TrajectoryDot
+    guid: 793854615
+    name: FilledBar
     layerFlags: 0
     layerType: 0
     blendMode: 0
     cells:
-    - name: TrajectoryDot
+    - name: FilledBar
       frameIndex: 0
       additiveSortOrder: 0
       cellRect:
-        x: 20
-        y: 10
-        width: 7
-        height: 7
-      spriteId: 895be0bd149f3fe45a164c8a81bdf7b9
+        x: 2
+        y: 6
+        width: 12
+        height: 4
+      spriteId: b2861e7ee38ef0f4488cad798110e24e
     linkedCells: []
     parentIndex: -1
   platformSettings:
+  - name: Default
+    overridden: 0
+    ignorePlatformSupport: 0
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    androidETC2FallbackOverride: 0
   - name: DefaultTexturePlatform
     overridden: 0
     ignorePlatformSupport: 0
@@ -180,7 +192,7 @@ ScriptedImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     forceMaximumCompressionQuality_BC6H_BC7: 0
     crunchedCompression: 0
@@ -192,7 +204,19 @@ ScriptedImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
+    compressionQuality: 50
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    androidETC2FallbackOverride: 0
+  - name: iPhone
+    overridden: 0
+    ignorePlatformSupport: 0
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
     compressionQuality: 50
     forceMaximumCompressionQuality_BC6H_BC7: 0
     crunchedCompression: 0
@@ -201,4 +225,4 @@ ScriptedImporter:
   generatePhysicsShape: 0
   secondarySpriteTextures: []
   spritePackingTag: 
-  canvasSize: {x: 31, y: 20}
+  canvasSize: {x: 16, y: 16}

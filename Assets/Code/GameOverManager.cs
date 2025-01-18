@@ -20,7 +20,6 @@ public class GameOverManager : MonoBehaviour
     private float moveDuration = 0.5f;
 
     [SerializeField] private List<GameObject> menuElements;
-    [SerializeField] private TextMeshProUGUI playText;
 
     [SerializeField] private GameObject ball;
     [SerializeField] private GameObject platform;
@@ -105,8 +104,6 @@ public class GameOverManager : MonoBehaviour
                 yield return new WaitForSeconds(0.5f);
             }
         }
-
-        StartCoroutine(Utils.ChangeOpacityOverTime(playText, 1f, 0.2f));
 
         yield return new WaitForSeconds(0.2f);
 

@@ -77,7 +77,7 @@ public class Utils : MonoBehaviour
 
         while (true)
         {
-            text.alpha = -Mathf.PingPong(Time.time / blinkTime, 1f) + 1;
+            text.alpha = Mathf.PingPong(Time.time / blinkTime, 1f);
             yield return null;
         }
     }

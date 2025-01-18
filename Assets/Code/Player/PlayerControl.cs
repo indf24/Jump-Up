@@ -36,7 +36,7 @@ public class PlayerControl : MonoBehaviour
 
                 if (touch.phase is TouchPhase.Ended)
                 {
-                    trajectoryManager.DespawnDots();
+                    trajectoryManager.DespawnBars();
                     Jump(jumpVector);
                     PlayerManager.DisableInput();
                     EventHub.PlayerJump();
@@ -46,7 +46,7 @@ public class PlayerControl : MonoBehaviour
             }
             else
             {
-                trajectoryManager.DespawnDots();
+                trajectoryManager.DespawnBars();
                 EventHub.PlayerAnimation("Holding", false);
             }
         }

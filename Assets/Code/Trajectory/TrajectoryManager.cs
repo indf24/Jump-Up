@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 public class TrajectoryManager : MonoBehaviour
@@ -49,7 +50,9 @@ public class TrajectoryManager : MonoBehaviour
     // Creates a new trajectory when needed
     public void MakeTrajectory(Rigidbody2D rigidbody, Vector2 jumpVector, int minJumpForce, int maxJumpForce)
     {
-        float steps = maxTrajectorySteps * ((jumpVector.y - minJumpForce) / (maxJumpForce - minJumpForce));
+        float jumpMagnitude = jumpVector.magnitude;
+        float steps = maxTrajectorySteps * ((jumpMagnitude - minJumpForce) / (maxJumpForce - minJumpForce));
+        steps = jumpMagnitude >= 1349f ? 10 : Mathf.FloorToInt(Mathf.Clamp(steps, 0, maxTrajectorySteps));
 
         DespawnBars();
         List<Vector2> trajectoryPoints = CalculateTrajectory(rigidbody.transform.position, jumpVector);

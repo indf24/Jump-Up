@@ -11,7 +11,7 @@ public class PlayerControl : MonoBehaviour
     private Vector2 startTouchPosition;
     private Vector2 endTouchPosition;
 
-    private int minJumpForce = 600;
+    private int minJumpForce = 150;
     private int maxJumpForce = 1350;
 
     // Manages the entire player control by detecting screen touch

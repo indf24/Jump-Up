@@ -34,7 +34,7 @@ public class MainMenuManager : MonoBehaviour
             {
                 Vector2 endTouchPosition = touch.position;
 
-                if (Vector2.Distance(startTouchPosition, endTouchPosition) > 15f && start)
+                if (Vector2.Distance(startTouchPosition, endTouchPosition) > 30f && start)
                 {
                     start = false;
                 }

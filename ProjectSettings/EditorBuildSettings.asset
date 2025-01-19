@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Level/Scenes/GameMode1.unity
     guid: 3fc8acdd13e6c734bafef6554d6fdbcd
+  - enabled: 0
+    path: Assets/IronSource/DemoScene/IronSourceDemo.unity
+    guid: ccc0ac08126704384bdda74c26d99797
   m_configObjects:
     com.unity.adaptiveperformance.google.android.provider_settings: {fileID: 11400000, guid: 8b77917294acd944fa8d177e0189487e, type: 2}
     com.unity.adaptiveperformance.loader_settings: {fileID: 11400000, guid: 51084e10b49924a409690ec52c885fc2, type: 2}

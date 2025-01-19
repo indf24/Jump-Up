@@ -190,8 +190,10 @@ PlayerSettings:
   strictShaderVariantMatching: 0
   VertexChannelCompressionMask: 4054
   iPhoneSdkVersion: 988
+  iOSSimulatorArchitecture: 0
   iOSTargetOSVersionString: 12.0
   tvOSSdkVersion: 0
+  tvOSSimulatorArchitecture: 0
   tvOSRequireExtendedGameController: 0
   tvOSTargetOSVersionString: 12.0
   VisionOSSdkVersion: 0
@@ -685,6 +687,7 @@ PlayerSettings:
   switchSocketBufferEfficiency: 4
   switchSocketInitializeEnabled: 1
   switchNetworkInterfaceManagerInitializeEnabled: 1
+  switchDisableHTCSPlayerConnection: 0
   switchUseNewStyleFilepaths: 1
   switchUseLegacyFmodPriorities: 0
   switchUseMicroSleepForYield: 1
@@ -905,7 +908,7 @@ PlayerSettings:
   cloudProjectId: d5c281e8-cdb2-4f1a-9a55-d257491a8ab9
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: Jump Up 2024-05-27_19-23-10
+  projectName: Jump Up
   organizationId: rubenferreira300
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0

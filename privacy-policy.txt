@@ -1,0 +1,43 @@
+Privacy Policy
+This privacy policy applies to the Jump Up app (hereinafter referred to as "Application") for mobile devices, developed by Ruben Ferreira (hereinafter referred to as "Service Provider"). This is an Ad-supported service, provided "AS IS."
+
+What information does the Application obtain and how is it used?
+
+Automatically Collected Information
+The Application may automatically collect certain information, including, but not limited to, the type of mobile device you use, your device’s unique identifiers, IP address, operating system, and information about how you use the Application. This data is primarily collected by third-party services like AdMob to serve ads and improve user experience.
+
+Does the Application collect precise real-time location information of the device?
+The Application does not collect precise real-time location information. However, AdMob may collect coarse location data based on your device's IP address for ad targeting purposes.
+
+Do third parties see and/or have access to information obtained by the Application?
+The Application uses third-party services, such as AdMob, which may collect, use, and share data as described in their privacy policies. Only aggregated and anonymized data is transmitted to third-party services for improving the Application.
+
+The Service Provider may disclose User Provided and Automatically Collected Information:
+    As required by law (e.g., to comply with a subpoena or similar legal process);
+    When the Service Provider believes disclosure is necessary to protect their rights, safety, or to respond to government requests;
+    With trusted service providers who operate on behalf of the Service Provider, under strict terms to protect your data.
+For more information on how AdMob handles your data, refer to their privacy policy: AdMob Privacy Policy
+
+Opt-Out Rights
+Users can opt out of personalized advertising through the AdMob consent form within the Application or by adjusting their ad preferences in their Google account settings.
+
+Data Retention Policy, Managing Your Information
+The Service Provider will retain any collected data for as long as you use the Application. Data collected by AdMob is managed by Google in accordance with their privacy policies.
+If you'd like to delete any data you’ve provided, please contact us at rubenferreira300@gmail.com.
+
+Children
+The Application does not knowingly collect personal information from children under 13. If you are a parent or guardian and you believe your child has provided us with personal information, please contact us so that we can take the necessary actions.
+
+Security
+The Service Provider takes precautions to safeguard the confidentiality of your information. However, no security system is completely foolproof. We strive to protect your information but cannot guarantee absolute security.
+
+Changes
+This Privacy Policy may be updated occasionally. The Service Provider will notify you of any changes by updating this page. Please review this Privacy Policy regularly. Continued use of the Application signifies acceptance of any changes.
+
+This privacy policy is effective as of 2025-01-19.
+
+Your Consent
+By using the Application, you consent to the processing of your information as described in this Privacy Policy.
+
+Contact Us
+For any questions about privacy while using the Application, or regarding this Privacy Policy, please contact us at rubenferreira300@gmail.com.

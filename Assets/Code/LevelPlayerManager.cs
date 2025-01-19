@@ -27,6 +27,11 @@ public class LevelPlayerManager : MonoBehaviour
 
     private void Start()
     {
+        IronSource.Agent.setMetaData("AdMob_TFCD", "false");
+        IronSource.Agent.setMetaData("AdMob_TFUA", "false");
+        IronSource.Agent.setMetaData("AdMob_MaxContentRating", "MAX_AD_CONTENT_RATING_MA");
+        IronSource.Agent.setMetaData("is_test_suite", "enable");
+
         IronSource.Agent.validateIntegration();
         IronSource.Agent.init(appKey);
 
@@ -55,6 +60,8 @@ public class LevelPlayerManager : MonoBehaviour
     private void SDKInitialized()
     {
         Debug.Log("SDK has initialized.");
+        IronSource.Agent.launchTestSuite();
+        LoadBanner();
     }
 
     private void OnApplicationPause(bool pause)
@@ -125,7 +132,7 @@ public class LevelPlayerManager : MonoBehaviour
         Debug.Log("Ad clicked.");
     }
 
-    private void ShowBanner()
+    private void LoadBanner()
     {
         IronSource.Agent.loadBanner(IronSourceBannerSize.SMART, IronSourceBannerPosition.TOP);
     }

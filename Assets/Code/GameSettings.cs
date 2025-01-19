@@ -36,7 +36,11 @@ public class GameSettings : MonoBehaviour
 
     private void ApplyGameSettings()
     {
+# if UNITY_EDITOR
+        Application.targetFrameRate = 400;
+#else
         Application.targetFrameRate = 60;
+#endif
         QualitySettings.vSyncCount = 0;
         Screen.SetResolution(1080, 1920, true);
     }

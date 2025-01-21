@@ -10,10 +10,7 @@ public class SceneControl : MonoBehaviour
         SceneManager.sceneLoaded += OnSceneLoad;
     }
 
-    private void OnDestroy()
-    {
-        SceneManager.sceneLoaded -= OnSceneLoad;
-    }
+    private void OnDestroy() => SceneManager.sceneLoaded -= OnSceneLoad;
 
     // Reloads the current scene
     public static void ReloadScene()
@@ -22,15 +19,8 @@ public class SceneControl : MonoBehaviour
         SceneManager.LoadScene(scene.name);
     }
 
-
     // Loads a scene
-    public static void LoadScene(string sceneName)
-    {
-        SceneManager.LoadScene(sceneName);
-    }
+    public static void LoadScene(string sceneName) => SceneManager.LoadScene(sceneName);
 
-    private void OnSceneLoad(Scene scene, LoadSceneMode mode)
-    {
-        PlayerManager.EnableInput();
-    }
+    private void OnSceneLoad(Scene scene, LoadSceneMode mode) => PlayerManager.EnableInput();
 }

@@ -8,8 +8,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private Transform sprite;
     [SerializeField] private Animator animator;
 
-    private static bool playerInputAllowed = false;
-    public static bool PlayerInputAllowed => playerInputAllowed;
+    public static bool PlayerInputAllowed { get; private set; } = false;
 
     private RaycastHit2D hit;
 
@@ -31,14 +30,11 @@ public class PlayerManager : MonoBehaviour
         EventHub.RunPlayerAnimation -= PlayerAnimation;
     }
 
-    private void Update()
-    {
-        sprite.rotation = Quaternion.identity;
-    }
+    private void Update() => sprite.rotation = Quaternion.identity;
 
     // Methods to safely modify the value
-    public static void EnableInput() => playerInputAllowed = true;
-    public static void DisableInput() => playerInputAllowed = false;
+    public static void EnableInput() => PlayerInputAllowed = true;
+    public static void DisableInput() => PlayerInputAllowed = false;
 
     // Stops the player
     private void StopMovement()
@@ -48,10 +44,7 @@ public class PlayerManager : MonoBehaviour
     }
 
     // Checks if the player is in contact the top of a platform  
-    private bool IsGrounded()
-    {
-        return hit.collider != null && hit.collider.CompareTag("Platform");
-    }
+    private bool IsGrounded() => hit.collider != null && hit.collider.CompareTag("Platform");
 
     // Creates a raycast for detection of contact between the player and a platform
     private void CreateGroudedRay()
@@ -63,10 +56,7 @@ public class PlayerManager : MonoBehaviour
         Debug.DrawRay(rayOrigin, Vector2.down * rayDistance, Color.red, 0.1f);
     }
 
-    private void StartPlatformCollision()
-    {
-        StartCoroutine(PlatformCollision());
-    }
+    private void StartPlatformCollision() => StartCoroutine(PlatformCollision());
 
     private IEnumerator PlatformCollision()
     {
@@ -91,8 +81,5 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private void PlayerAnimation(string animation, bool state)
-    {
-        animator.SetBool(animation, state);
-    }
+    private void PlayerAnimation(string animation, bool state) => animator.SetBool(animation, state);
 }

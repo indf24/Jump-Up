@@ -23,16 +23,9 @@ public class GameSettings : MonoBehaviour
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
-    private void OnDestroy()
-    {
-        // Unsubscribe from the event to avoid memory leaks
-        SceneManager.sceneLoaded -= OnSceneLoaded;
-    }
+    private void OnDestroy() => SceneManager.sceneLoaded -= OnSceneLoaded;
 
-    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
-        ApplyGameSettings();
-    }
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode) => ApplyGameSettings();
 
     private void ApplyGameSettings()
     {

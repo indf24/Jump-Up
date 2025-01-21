@@ -13,25 +13,13 @@ public class TrajectoryManager : MonoBehaviour
     private Queue<TrajectoryBar> trajectoryFilledBarPool = new();
     private int maxTrajectorySteps = 10;
 
-    private void Start()
-    {
-        CreatePool();
-    }
+    private void Start() => CreatePool();
 
-    private void OnEnable()
-    {
-        EventHub.OnPlayerJump += DespawnBars;
-    }
+    private void OnEnable() => EventHub.OnPlayerJump += DespawnBars;
 
-    private void OnDisable()
-    {
-        EventHub.OnPlayerJump -= DespawnBars;
-    }
+    private void OnDisable() => EventHub.OnPlayerJump -= DespawnBars;
 
-    private void OnDestroy()
-    {
-        EventHub.OnPlayerJump -= DespawnBars;
-    }
+    private void OnDestroy() => EventHub.OnPlayerJump -= DespawnBars;
 
     // Creates a pool of trajectory bars to use throughout the game
     private void CreatePool()
@@ -74,13 +62,12 @@ public class TrajectoryManager : MonoBehaviour
         // Place bars progressively along the trajectory length
         for (int i = 0; i < maxTrajectorySteps; i++)
         {
-            Vector2 point = startPos + normalizedDirection * (totalLength / maxTrajectorySteps * i);
+            Vector2 point = startPos + (normalizedDirection * (totalLength / maxTrajectorySteps * i));
             points.Add(point);
         }
 
         return points;
     }
-
 
     // Places the trajectory bars
     private void DrawTrajectory(List<Vector2> trajectoryPoints, float steps)

@@ -15,10 +15,7 @@ public class MainMenuManager : MonoBehaviour
 
     private Vector2 startTouchPosition;
 
-    private void Start()
-    {
-        blinkingPlayText = StartCoroutine(Utils.BlinkText(playText, 1f));
-    }
+    private void Start() => blinkingPlayText = StartCoroutine(Utils.BlinkText(playText, 1f));
 
     void Update()
     {

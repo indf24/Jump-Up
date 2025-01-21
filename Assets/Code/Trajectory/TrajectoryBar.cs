@@ -10,8 +10,5 @@ public class TrajectoryBar : MonoBehaviour
     }
 
     // Despawns a dot
-    public void Despawn()
-    {
-        gameObject.SetActive(false);
-    }
+    public void Despawn() => gameObject.SetActive(false);
 }

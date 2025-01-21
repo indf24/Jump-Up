@@ -33,9 +33,9 @@ public class GameOverManager : MonoBehaviour
     private IEnumerator GameOverScreen()
     {
         StartCoroutine(ResetBall());
-        StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000f), 0.5f, "ease", true));
-        yield return new WaitForSeconds(0.8f);
-        yield return StartCoroutine(ShowGameOverUI());
+        yield return StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000f), 0.5f, "ease", true));
+        yield return new WaitForSeconds(0.3f);
+        StartCoroutine(ShowGameOverUI());
     }
 
     private IEnumerator Retry()
@@ -117,5 +117,4 @@ public class GameOverManager : MonoBehaviour
         EventHub.GameOver();
         StartCoroutine(GameOverScreen());
     }
-
 }

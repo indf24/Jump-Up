@@ -23,28 +23,13 @@ public class EventHub : MonoBehaviour
         OnScoreEarned?.Invoke(points);
     }
 
-    public static void GameOver()
-    {
-        OnGameOver?.Invoke();
-    }
+    public static void GameOver() => OnGameOver?.Invoke();
 
-    public static void PlatformCollision()
-    {
-        OnPlatformCollision?.Invoke();
-    }
+    public static void PlatformCollision() => OnPlatformCollision?.Invoke();
 
-    public static void PlayerAnimation(string animationId, bool state)
-    {
-        RunPlayerAnimation?.Invoke(animationId, state);
-    }
+    public static void PlayerAnimation(string animationId, bool state) => RunPlayerAnimation?.Invoke(animationId, state);
 
-    public static void PlayerJump()
-    {
-        OnPlayerJump?.Invoke();
-    }
+    public static void PlayerJump() => OnPlayerJump?.Invoke();
 
-    public static void Retry()
-    {
-        OnRetry?.Invoke();
-    }
+    public static void Retry() => OnRetry?.Invoke();
 }

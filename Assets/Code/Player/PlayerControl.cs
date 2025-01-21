@@ -70,16 +70,9 @@ public class PlayerControl : MonoBehaviour
         return jumpVector;
     }
 
-    private Vector2 LimitJumpForce(Vector2 jumpVector)
-    {
-        return jumpVector.normalized * Mathf.Clamp(jumpVector.magnitude, minJumpForce, maxJumpForce);
-    }
+    private Vector2 LimitJumpForce(Vector2 jumpVector) => jumpVector.normalized * Mathf.Clamp(jumpVector.magnitude, minJumpForce, maxJumpForce);
 
-    private void Jump(Vector2 jumpVector)
-    {
-        // Apply the force to the ball
-        player.AddForce(jumpVector, ForceMode2D.Impulse);
-    }
+    private void Jump(Vector2 jumpVector) => player.AddForce(jumpVector, ForceMode2D.Impulse);
 
     private void OnCollisionEnter2D(Collision2D collision)
     {

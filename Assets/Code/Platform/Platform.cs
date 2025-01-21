@@ -54,7 +54,6 @@ public class Platform : MonoBehaviour
         return new Vector2(xSpawnPos, ySpawnPos);
     }
 
-
     // Despawns the platform
     public IEnumerator Despawn()
     {
@@ -66,8 +65,5 @@ public class Platform : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void Move(Vector2 targetPos, float duration)
-    {
-        StartCoroutine(Utils.MoveObject(gameObject, targetPos, duration));
-    }
+    public void Move(Vector2 targetPos, float duration) => StartCoroutine(Utils.MoveObject(gameObject, targetPos, duration));
 }

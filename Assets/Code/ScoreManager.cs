@@ -10,10 +10,7 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI finalScore;
     [SerializeField] private TextMeshProUGUI bestScore;
 
-    private void Start()
-    {
-        highscore = PlayerPrefs.GetInt("Highscore", 0);
-    }
+    private void Start() => highscore = PlayerPrefs.GetInt("Highscore", 0);
 
     private void OnEnable()
     {
@@ -47,10 +44,7 @@ public class ScoreManager : MonoBehaviour
     }
 
     // Updates the score counter in the screen
-    private void UpdateScore()
-    {
-        currentScore.text = score.ToString();
-    }
+    private void UpdateScore() => currentScore.text = score.ToString();
 
     // Update the high score on game over
     private void UpdateHighscore()
@@ -68,8 +62,5 @@ public class ScoreManager : MonoBehaviour
         bestScore.text = highscore.ToString();
     }
 
-    private void ResetCurrentScore()
-    {
-        currentScore.text = "0";
-    }
+    private void ResetCurrentScore() => currentScore.text = "0";
 }

@@ -1,14 +1,26 @@
-//using GoogleMobileAds.Ump.Api;
 using UnityEngine;
-using UnityEngine.Events;
+using com.unity3d.mediation;
+using System;
+using GoogleMobileAds.Ump.Api;
 
 public class LevelPlayerManager : MonoBehaviour
 {
     public static LevelPlayerManager instance;
+    public static string uniqueUserId = "demoUserUnity";
 
-    [SerializeField] private string appKey = "20c4450e5";
+#if UNITY_ANDROID
+    private string appKey = "85460dcd";
+    private string bannerAdUnitId = "thnfvcsog13bhn08";
+#elif UNITY_IPHONE
+    private string appKey = "8545d445";
+    private string bannerAdUnitId = "iep3rxsyp9na3rw8";
+#else
+    private string appKey = "unexpected_platform";
+    private string bannerAdUnitId = "unexpected_platform";
+#endif
 
-    UnityAction<bool, int> rewardedCallBack;
+    private LevelPlayBannerAd bannerAd;
+    private int userTotalCredits = 0;
 
     private void Awake()
     {
@@ -17,13 +29,16 @@ public class LevelPlayerManager : MonoBehaviour
             instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else if (instance != this)
+        else
         {
             Destroy(gameObject);
+            return;
         }
+
+        Debug.Log("unity-script: Awake called");
     }
 
-    /*private void Start()
+    private void Start()
     {
         // Create a ConsentRequestParameters object.
         ConsentRequestParameters request = new();
@@ -51,7 +66,7 @@ public class LevelPlayerManager : MonoBehaviour
             // Consent has been gathered, now update it in ironSource
             UpdateConsent();
         });
-    }*/
+    }
 
     private void UpdateConsent()
     {
@@ -88,118 +103,59 @@ public class LevelPlayerManager : MonoBehaviour
 
     private void InitializeIronSource()
     {
-        IronSource.Agent.setMetaData("AdMob_TFCD", "false");
-        IronSource.Agent.setMetaData("AdMob_TFUA", "false");
-        IronSource.Agent.setMetaData("AdMob_MaxContentRating", "MAX_AD_CONTENT_RATING_MA");
-        IronSource.Agent.setMetaData("is_test_suite", "enable");
-
+        IronSourceConfig.Instance.setClientSideCallbacks(true);
         IronSource.Agent.validateIntegration();
-        IronSource.Agent.init(appKey);
+        Debug.Log("unity-script: unity version " + IronSource.unityVersion());
 
-        IronSourceRewardedVideoEvents.onAdOpenedEvent += RewardedVideoOnAdOpenedEvent;
-        IronSourceRewardedVideoEvents.onAdClosedEvent += RewardedVideoOnAdClosedEvent;
-        IronSourceRewardedVideoEvents.onAdAvailableEvent += RewardedVideoOnAdAvailable;
-        IronSourceRewardedVideoEvents.onAdUnavailableEvent += RewardedVideoOnAdUnavailable;
-        IronSourceRewardedVideoEvents.onAdShowFailedEvent += RewardedVideoOnAdShowFailedEvent;
-        IronSourceRewardedVideoEvents.onAdRewardedEvent += RewardedVideoOnAdRewardedEvent;
-        IronSourceRewardedVideoEvents.onAdClickedEvent += RewardedVideoOnAdClickedEvent;
+        LevelPlay.Init(appKey, uniqueUserId, new[] { LevelPlayAdFormat.REWARDED });
 
-        IronSourceBannerEvents.onAdLoadedEvent += BannerOnAdLoadedEvent;
-        IronSourceBannerEvents.onAdLoadFailedEvent += BannerOnAdLoadFailedEvent;
-        IronSourceBannerEvents.onAdClickedEvent += BannerOnAdClickedEvent;
-        IronSourceBannerEvents.onAdScreenPresentedEvent += BannerOnAdScreenPresentedEvent;
-        IronSourceBannerEvents.onAdScreenDismissedEvent += BannerOnAdScreenDismissedEvent;
-        IronSourceBannerEvents.onAdLeftApplicationEvent += BannerOnAdLeftApplicationEvent;
-
-        IronSourceEvents.onSdkInitializationCompletedEvent += SDKInitialized;
+        LevelPlay.OnInitSuccess += OnInitializationCompleted;
+        LevelPlay.OnInitFailed += (error => Debug.LogError("Initialization error: " + error));
     }
 
-    private void SDKInitialized()
+    private void OnInitializationCompleted(LevelPlayConfiguration configuration)
     {
-        Debug.Log("SDK has initialized.");
-        IronSource.Agent.launchTestSuite();
+        Debug.Log("Initialization completed.");
         LoadBanner();
+        InitializeRewardedAds();
     }
 
-    private void OnApplicationPause(bool pause) => IronSource.Agent.onApplicationPause(pause);
-
-    public void ShowReward(UnityAction<bool, int> rewardedCallback)
+    private void LoadBanner()
     {
-        rewardedCallBack = rewardedCallback;
+        bannerAd = new LevelPlayBannerAd(bannerAdUnitId);
 
+        bannerAd.OnAdLoaded += (adInfo) => Debug.Log("Banner Loaded: " + adInfo);
+        bannerAd.OnAdLoadFailed += (error) => Debug.LogError("Banner Failed to Load: " + error);
+        bannerAd.OnAdDisplayed += (adInfo) => Debug.Log("Banner Displayed: " + adInfo);
+        bannerAd.LoadAd();
+    }
+
+    private void InitializeRewardedAds()
+    {
+        IronSourceRewardedVideoEvents.onAdOpenedEvent += (adInfo) => Debug.Log("Rewarded Video Opened: " + adInfo);
+        IronSourceRewardedVideoEvents.onAdClosedEvent += (adInfo) => Debug.Log("Rewarded Video Closed: " + adInfo);
+        IronSourceRewardedVideoEvents.onAdRewardedEvent += RewardedVideoOnAdRewardedEvent;
+    }
+
+    public void ShowRewardedVideo()
+    {
         if (IronSource.Agent.isRewardedVideoAvailable())
         {
             IronSource.Agent.showRewardedVideo();
         }
         else
         {
-            Debug.Log("Reward video unavailable.");
-            rewardedCallback(false, 0);
+            Debug.Log("Rewarded video not available");
         }
     }
 
-    /************* RewardedVideo AdInfo Delegates *************/
-    // Indicates that there’s an available ad.
-    // The adInfo object includes information about the ad that was loaded successfully
-    // This replaces the RewardedVideoAvailabilityChangedEvent(true) event
-    void RewardedVideoOnAdAvailable(IronSourceAdInfo adInfo) => Debug.Log("Reward video available.");
-
-    // Indicates that no ads are available to be displayed
-    // This replaces the RewardedVideoAvailabilityChangedEvent(false) event
-    void RewardedVideoOnAdUnavailable()
+    private void RewardedVideoOnAdRewardedEvent(IronSourcePlacement placement, IronSourceAdInfo adInfo)
     {
-        Debug.Log("Reward video unavailable.");
-        rewardedCallBack(false, 0);
+        Debug.Log("Reward received for placement: " + placement);
+        userTotalCredits += placement.getRewardAmount();
     }
 
-    // The Rewarded Video ad view has opened. Your activity will loose focus.
-    void RewardedVideoOnAdOpenedEvent(IronSourceAdInfo adInfo) => Debug.Log("Ad opened.");
+    private void OnApplicationPause(bool pause) => IronSource.Agent.onApplicationPause(pause);
 
-    // The Rewarded Video ad view is about to be closed. Your activity will regain its focus.
-    void RewardedVideoOnAdClosedEvent(IronSourceAdInfo adInfo) => Debug.Log("Ad closed.");
-
-    // The user completed to watch the video, and should be rewarded.
-    // The placement parameter will include the reward data.
-    // When using server-to-server callbacks, you may ignore this event and wait for the ironSource server callback.
-    void RewardedVideoOnAdRewardedEvent(IronSourcePlacement placement, IronSourceAdInfo adInfo)
-    {
-        Debug.Log($"Reward has been rewarded: {placement.getRewardAmount()}.");
-        rewardedCallBack(true, placement.getRewardAmount());
-    }
-
-    // The rewarded video ad was failed to show.
-    void RewardedVideoOnAdShowFailedEvent(IronSourceError error, IronSourceAdInfo adInfo)
-    {
-        Debug.Log("Ad failed to show.");
-        rewardedCallBack(false, 0);
-    }
-
-    // Invoked when the video ad was clicked.
-    // This callback is not supported by all networks, and we recommend using it only if
-    // it’s supported by all networks you included in your build.
-    void RewardedVideoOnAdClickedEvent(IronSourcePlacement placement, IronSourceAdInfo adInfo) => Debug.Log("Ad clicked.");
-
-    private void LoadBanner() => IronSource.Agent.loadBanner(IronSourceBannerSize.SMART, IronSourceBannerPosition.TOP);
-
-    private void DestroyBanner() => IronSource.Agent.destroyBanner();
-
-    /************* Banner AdInfo Delegates *************/
-
-    //Invoked once the banner has loaded
-    void BannerOnAdLoadedEvent(IronSourceAdInfo adInfo) => Debug.Log("Banner loaded.");
-
-    //Invoked when the banner loading process has failed.
-    void BannerOnAdLoadFailedEvent(IronSourceError ironSourceError) => Debug.Log($"Banner failed to load: {ironSourceError}.");
-
-    // Invoked when end user clicks on the banner ad
-    void BannerOnAdClickedEvent(IronSourceAdInfo adInfo) => Debug.Log("Banner clicked.");
-
-    //Notifies the presentation of a full screen content following user click
-    void BannerOnAdScreenPresentedEvent(IronSourceAdInfo adInfo) => Debug.Log("Banner screen presented.");
-
-    //Notifies the presented screen has been dismissed
-    void BannerOnAdScreenDismissedEvent(IronSourceAdInfo adInfo) => Debug.Log("Banner screen dismissed");
-
-    //Invoked when the user leaves the app
-    void BannerOnAdLeftApplicationEvent(IronSourceAdInfo adInfo) => Debug.Log("Banner left application");
+    private void OnDestroy() => bannerAd?.DestroyAd();
 }

@@ -1,16 +1,19 @@
-using UnityEngine;
 using com.unity3d.mediation;
-using System;
 using GoogleMobileAds.Ump.Api;
+using System.Collections;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class LevelPlayerManager : MonoBehaviour
 {
     public static LevelPlayerManager instance;
-    public static string uniqueUserId = "demoUserUnity";
+
+    [SerializeField] private Button continueButton;
 
 #if UNITY_ANDROID
-    private string appKey = "85460dcd";
-    private string bannerAdUnitId = "thnfvcsog13bhn08";
+    private string appKey = "20c4450e5";
+    private string bannerAdUnitId = "myu5mmnobtfji56s";
 #elif UNITY_IPHONE
     private string appKey = "8545d445";
     private string bannerAdUnitId = "iep3rxsyp9na3rw8";
@@ -20,7 +23,6 @@ public class LevelPlayerManager : MonoBehaviour
 #endif
 
     private LevelPlayBannerAd bannerAd;
-    private int userTotalCredits = 0;
 
     private void Awake()
     {
@@ -28,18 +30,18 @@ public class LevelPlayerManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoad;
         }
         else
         {
             Destroy(gameObject);
             return;
         }
-
-        Debug.Log("unity-script: Awake called");
     }
 
     private void Start()
     {
+        ConsentInformation.Reset();
         // Create a ConsentRequestParameters object.
         ConsentRequestParameters request = new();
 
@@ -63,11 +65,11 @@ public class LevelPlayerManager : MonoBehaviour
                 return;
             }
 
-            // Consent has been gathered, now update it in ironSource
-            UpdateConsent();
+            InitializeIronSource();
         });
     }
 
+    /*
     private void UpdateConsent()
     {
         string CMPString = PlayerPrefs.GetString("IABTCF_AddtlConsent");
@@ -100,40 +102,62 @@ public class LevelPlayerManager : MonoBehaviour
         // Initialize ironSource only after processing consent
         InitializeIronSource();
     }
+    */
 
     private void InitializeIronSource()
     {
-        IronSourceConfig.Instance.setClientSideCallbacks(true);
         IronSource.Agent.validateIntegration();
-        Debug.Log("unity-script: unity version " + IronSource.unityVersion());
+        IronSource.Agent.shouldTrackNetworkState(true);
+        IronSource.Agent.setMetaData("AdMob_TFCD", "false");
+        IronSource.Agent.setMetaData("AdMob_TFUA", "false");
+        IronSource.Agent.setMetaData("AdMob_MaxContentRating", "MAX_AD_CONTENT_RATING_MA");
+        IronSource.Agent.setMetaData("is_test_suite", "enable");
 
-        LevelPlay.Init(appKey, uniqueUserId, new[] { LevelPlayAdFormat.REWARDED });
+        LevelPlay.Init(appKey, adFormats: new[] { LevelPlayAdFormat.REWARDED });
 
         LevelPlay.OnInitSuccess += OnInitializationCompleted;
-        LevelPlay.OnInitFailed += (error => Debug.LogError("Initialization error: " + error));
+        LevelPlay.OnInitFailed += error => Debug.LogError("Initialization error: " + error);
     }
 
     private void OnInitializationCompleted(LevelPlayConfiguration configuration)
     {
         Debug.Log("Initialization completed.");
+        IronSource.Agent.launchTestSuite();
         LoadBanner();
         InitializeRewardedAds();
     }
 
     private void LoadBanner()
     {
-        bannerAd = new LevelPlayBannerAd(bannerAdUnitId);
+        bannerAd = new LevelPlayBannerAd(bannerAdUnitId, LevelPlayAdSize.CreateAdaptiveAdSize(), LevelPlayBannerPosition.TopCenter, "Startup", respectSafeArea: true);
 
         bannerAd.OnAdLoaded += (adInfo) => Debug.Log("Banner Loaded: " + adInfo);
-        bannerAd.OnAdLoadFailed += (error) => Debug.LogError("Banner Failed to Load: " + error);
+        bannerAd.OnAdLoadFailed += BannerOnAdLoadFailedEvent;
         bannerAd.OnAdDisplayed += (adInfo) => Debug.Log("Banner Displayed: " + adInfo);
+        bannerAd.LoadAd();
+    }
+
+    private void ShowBanner() => bannerAd.ShowAd();
+
+    private void HideBanner() => bannerAd.HideAd();
+
+    private void BannerOnAdLoadFailedEvent(LevelPlayAdError error)
+    {
+        Debug.LogError("Banner Failed to Load: " + error + "\nRetyring in 5 seconds");
+        //StartCoroutine(ReloadBanner());
+    }
+
+    private IEnumerator ReloadBanner()
+    {
+        yield return new WaitForSeconds(5f);
+        Debug.Log("Reloading banner...");
         bannerAd.LoadAd();
     }
 
     private void InitializeRewardedAds()
     {
-        IronSourceRewardedVideoEvents.onAdOpenedEvent += (adInfo) => Debug.Log("Rewarded Video Opened: " + adInfo);
-        IronSourceRewardedVideoEvents.onAdClosedEvent += (adInfo) => Debug.Log("Rewarded Video Closed: " + adInfo);
+        IronSourceRewardedVideoEvents.onAdOpenedEvent += RewardedVideoOnAdOpenedEvent;
+        IronSourceRewardedVideoEvents.onAdClosedEvent += RewardedVideoOnAdClosedEvent;
         IronSourceRewardedVideoEvents.onAdRewardedEvent += RewardedVideoOnAdRewardedEvent;
     }
 
@@ -141,7 +165,7 @@ public class LevelPlayerManager : MonoBehaviour
     {
         if (IronSource.Agent.isRewardedVideoAvailable())
         {
-            IronSource.Agent.showRewardedVideo();
+            IronSource.Agent.showRewardedVideo("Turn_Complete");
         }
         else
         {
@@ -149,13 +173,33 @@ public class LevelPlayerManager : MonoBehaviour
         }
     }
 
+    void RewardedVideoOnAdOpenedEvent(IronSourceAdInfo adInfo)
+    {
+        Debug.Log("Rewarded Video Opened: " + adInfo);
+        HideBanner();
+    }
+    void RewardedVideoOnAdClosedEvent(IronSourceAdInfo adInfo)
+    {
+        Debug.Log("Rewarded Video Closed: " + adInfo);
+        ShowBanner();
+    }
+
     private void RewardedVideoOnAdRewardedEvent(IronSourcePlacement placement, IronSourceAdInfo adInfo)
     {
         Debug.Log("Reward received for placement: " + placement);
-        userTotalCredits += placement.getRewardAmount();
+
     }
 
     private void OnApplicationPause(bool pause) => IronSource.Agent.onApplicationPause(pause);
 
     private void OnDestroy() => bannerAd?.DestroyAd();
+
+    private void OnSceneLoad(Scene scene, LoadSceneMode mode)
+    {
+        if (SceneManager.GetActiveScene().buildIndex is 1)
+        {
+            continueButton = GameObject.Find("Continue").GetComponent<Button>();
+            continueButton.onClick.AddListener(() => ShowRewardedVideo());
+        }
+    }
 }

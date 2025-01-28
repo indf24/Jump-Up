@@ -28,7 +28,8 @@ public class PlatformManager : MonoBehaviour
         EventHub.OnPlayerLanding += StartMovePlatform;
         EventHub.OnPlayerJump += DespawnPlatform;
         EventHub.OnGameOver += GameOver;
-        EventHub.OnRetry += Restart;
+        EventHub.OnRetry += ShowBottomPatform;
+        EventHub.OnSecondChance += StartSecondChance;
     }
 
     private void OnDisable()
@@ -36,7 +37,8 @@ public class PlatformManager : MonoBehaviour
         EventHub.OnPlayerLanding -= StartMovePlatform;
         EventHub.OnPlayerJump -= DespawnPlatform;
         EventHub.OnGameOver -= GameOver;
-        EventHub.OnRetry -= Restart;
+        EventHub.OnRetry -= ShowBottomPatform;
+        EventHub.OnSecondChance -= StartSecondChance;
     }
 
     private void OnDestroy()
@@ -44,7 +46,8 @@ public class PlatformManager : MonoBehaviour
         EventHub.OnPlayerLanding -= StartMovePlatform;
         EventHub.OnPlayerJump -= DespawnPlatform;
         EventHub.OnGameOver -= GameOver;
-        EventHub.OnRetry -= Restart;
+        EventHub.OnRetry -= ShowBottomPatform;
+        EventHub.OnSecondChance -= StartSecondChance;
     }
 
     // Creates a pool of platforms to use throughout the game
@@ -117,7 +120,7 @@ public class PlatformManager : MonoBehaviour
     {
         if (currentPlatform == bottomPlatform)
         {
-            StartCoroutine(MoveBottomPlatform());
+            StartCoroutine(HideBottomPlatform());
         }   
         else
         {
@@ -126,12 +129,21 @@ public class PlatformManager : MonoBehaviour
         }
     }
 
-    private IEnumerator MoveBottomPlatform()
+    private IEnumerator HideBottomPlatform()
     {
         Vector2 targetPos = new(bottomPlatform.transform.position.x, -2f);
         bottomPlatform.Move(targetPos, 0.7f);
         yield return new WaitForSeconds(0.7f);
         bottomPlatform.gameObject.SetActive(false);
+    }
+
+    private void StartSecondChance() => StartCoroutine(SecondChance());
+
+    private IEnumerator SecondChance()
+    {
+        ShowBottomPatform();
+        yield return new WaitForSeconds(2f);
+        SpawnPlatform();
     }
 
     private void GameOver()
@@ -140,7 +152,7 @@ public class PlatformManager : MonoBehaviour
         bottomPlatform.gameObject.SetActive(true);
     }
 
-    private void Restart()
+    private void ShowBottomPatform()
     {
         Vector2 targetPos = new(bottomPlatform.transform.position.x, 5.75f);
         bottomPlatform.Move(targetPos, 0.7f);

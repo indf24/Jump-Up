@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Schema;
+using UnityEditor;
 using UnityEngine;
 
 public class EventHub : MonoBehaviour
@@ -9,6 +10,7 @@ public class EventHub : MonoBehaviour
     public static event Action OnPlayerLanding;
     public static event Action<int> OnScoreEarned;
 
+    public static event Action OnSecondChance;
     public static event Action OnGameOver;
     public static event Action OnRetry;
 
@@ -22,7 +24,9 @@ public class EventHub : MonoBehaviour
         OnPlayerLanding?.Invoke();
         OnScoreEarned?.Invoke(points);
     }
-
+    
+    public static void SecondChance() => OnSecondChance?.Invoke();
+    
     public static void GameOver() => OnGameOver?.Invoke();
 
     public static void PlatformCollision() => OnPlatformCollision?.Invoke();

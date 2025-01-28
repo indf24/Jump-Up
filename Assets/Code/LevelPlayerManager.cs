@@ -43,6 +43,7 @@ public class LevelPlayerManager : MonoBehaviour
     private void Start()
     {
         ConsentInformation.Reset();
+
         // Create a ConsentRequestParameters object.
         ConsentRequestParameters request = new();
 
@@ -148,6 +149,8 @@ public class LevelPlayerManager : MonoBehaviour
     {
         Debug.Log($"Video ad closed: {adInfo}");
         ShowBanner();
+
+        EventHub.SecondChance();
     }
 
     private void OnApplicationPause(bool pause) => IronSource.Agent.onApplicationPause(pause);

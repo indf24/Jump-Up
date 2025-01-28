@@ -8,7 +8,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private Transform sprite;
     [SerializeField] private Animator animator;
 
-    public static bool PlayerInputAllowed { get; private set; } = false;
+    public static bool PlayerInputAllowed { get; set; } = false;
 
     private RaycastHit2D hit;
 

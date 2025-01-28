@@ -29,12 +29,12 @@ public class PlayerControl : MonoBehaviour
 
                 jumpVector = LimitJumpForce(jumpVector);
 
-                if (touch.phase is TouchPhase.Moved)
+                if (touch.phase == TouchPhase.Moved)
                 {   
                     trajectoryManager.MakeTrajectory(player, jumpVector, minJumpForce, maxJumpForce);
                 }
 
-                if (touch.phase is TouchPhase.Ended)
+                if (touch.phase == TouchPhase.Ended)
                 {
                     trajectoryManager.DespawnBars();
                     Jump(jumpVector);
@@ -56,7 +56,7 @@ public class PlayerControl : MonoBehaviour
     {
         Vector2 jumpVector = Vector2.zero;
 
-        if (touch.phase is TouchPhase.Began)
+        if (touch.phase == TouchPhase.Began)
         {
             startTouchPosition = touch.position;
         }

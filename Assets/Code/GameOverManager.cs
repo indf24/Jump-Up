@@ -33,7 +33,7 @@ public class GameOverManager : MonoBehaviour
     private IEnumerator GameOverScreen()
     {
         StartCoroutine(ResetBall());
-        yield return StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000f), 0.5f, "ease", true));
+        yield return StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000f), 0.5f, Utils.TransformType.Ease, true));
         yield return new WaitForSeconds(0.3f);
         StartCoroutine(ShowGameOverUI());
     }
@@ -68,23 +68,21 @@ public class GameOverManager : MonoBehaviour
     {
         for (int i = 0; i < gameElements.Count; i++)
         {
-            StartCoroutine(Utils.MoveObject(gameElements[i], new(targetPositionsEnter[i], gameElements[i].GetComponent<RectTransform>().anchoredPosition.y), moveDuration, "ease", true));
+            StartCoroutine(Utils.MoveObject(gameElements[i], new(targetPositionsEnter[i], gameElements[i].GetComponent<RectTransform>().anchoredPosition.y), moveDuration, Utils.TransformType.Ease, true));
             yield return new WaitForSeconds(delays[i]);
         }
 
-        StartCoroutine(Utils.MoveObject(UIBall, new(600f, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, "ease", true));
-        StartCoroutine(Utils.MoveObject(gameOverButtons, new(422.5f, gameOverButtons.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, "ease", true));
+        StartCoroutine(Utils.MoveObject(UIBall, new(600f, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, Utils.TransformType.Ease, true));
     }
 
     private void HideGameOverUI()
     {
         for (int i = 0; i < gameElements.Count; i++)
         {
-            StartCoroutine(Utils.MoveObject(gameElements[i], new(targetPositionsLeave[i], gameElements[i].GetComponent<RectTransform>().anchoredPosition.y), moveDuration, "ease", true));
+            StartCoroutine(Utils.MoveObject(gameElements[i], new(targetPositionsLeave[i], gameElements[i].GetComponent<RectTransform>().anchoredPosition.y), moveDuration, Utils.TransformType.Ease, true));
         }
 
-        StartCoroutine(Utils.MoveObject(UIBall, new(950f, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, "ease", true));
-        StartCoroutine(Utils.MoveObject(gameOverButtons, new(772.5f, gameOverButtons.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, "ease", true));
+        StartCoroutine(Utils.MoveObject(UIBall, new(950f, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, Utils.TransformType.Ease, true));
     }
 
     private IEnumerator LoadMenu()

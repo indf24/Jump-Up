@@ -141,6 +141,7 @@ public class PlatformManager : MonoBehaviour
 
     private IEnumerator SecondChance()
     {
+        currentPlatform = bottomPlatform;
         ShowBottomPatform();
         yield return new WaitForSeconds(2f);
         SpawnPlatform();

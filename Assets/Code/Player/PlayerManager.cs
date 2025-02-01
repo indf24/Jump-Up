@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Xml.Serialization;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
@@ -11,6 +13,8 @@ public class PlayerManager : MonoBehaviour
     public static bool PlayerInputAllowed { get; set; } = false;
 
     private RaycastHit2D hit;
+
+    private void Start() => EnableInput();
 
     private void OnEnable()
     {

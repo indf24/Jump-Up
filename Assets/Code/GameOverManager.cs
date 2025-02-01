@@ -33,7 +33,6 @@ public class GameOverManager : MonoBehaviour
     {
         retryButton.onClick.AddListener(() => StartCoroutine(Retry()));
         menuButton.onClick.AddListener(() => Menu());
-        //continueButton.onClick.AddListener(() => EventHub.Continue());
 
         EventHub.OnSecondChance += StartSecondChance;
     }
@@ -43,7 +42,7 @@ public class GameOverManager : MonoBehaviour
         // Check if there is at least one touch
         if (Input.touchCount > 0 && secondChanceReady)
         {
-            Touch touch = Input.GetTouch(0); // Get the first touch
+            Touch touch = Input.GetTouch(0);
 
             if (touch.phase == TouchPhase.Began)
             {
@@ -54,10 +53,6 @@ public class GameOverManager : MonoBehaviour
                 {
                     StartCoroutine(NoSecondChance());
                 }
-                else
-                {
-                    EventHub.SecondChance();
-                }
             }
         }
     }
@@ -65,10 +60,15 @@ public class GameOverManager : MonoBehaviour
     private IEnumerator ContinueScreen()
     {
         FreezeBall();
-        ball.transform.position = new Vector2(0, -1);
 
         continueText.SetActive(true);
         continueButton.gameObject.SetActive(true);
+
+        continueButton.onClick.AddListener(() =>
+        {
+            Debug.Log("Continue button clicked!");
+            LevelPlayManager.instance.ShowRewardedVideo();
+        });
 
         yield return StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000f), 0.5f, Utils.TransformType.Ease, true));
         yield return StartCoroutine(Utils.MoveObject(ball, new Vector2(0, 15), 0.8f, Utils.TransformType.Ease));
@@ -107,10 +107,8 @@ public class GameOverManager : MonoBehaviour
 
     private IEnumerator GameOverScreen()
     {
-        yield return new WaitForSeconds(0.5f);
         ResetBall();
         yield return StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000f), 0.5f, Utils.TransformType.Ease, true));
-        yield return new WaitForSeconds(0.3f);
         StartCoroutine(ShowGameOverUI());
     }
 

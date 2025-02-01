@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -15,7 +14,11 @@ public class MainMenuManager : MonoBehaviour
 
     private Vector2 startTouchPosition;
 
-    private void Start() => blinkingPlayText = StartCoroutine(Utils.BlinkText(playText, 1f));
+    private void Start()
+    {
+        blinkingPlayText = StartCoroutine(Utils.BlinkText(playText, 1f));
+        PlayerManager.EnableInput();
+    }
 
     void Update()
     {
@@ -55,7 +58,7 @@ public class MainMenuManager : MonoBehaviour
                 bool hitUI = false;
                 foreach (RaycastResult result in results)
                 {
-                    if (result.gameObject.layer == LayerMask.NameToLayer("UI"))
+                    if (result.gameObject.CompareTag("Buttons"))
                     {
                         hitUI = true;
                         break;
@@ -86,9 +89,9 @@ public class MainMenuManager : MonoBehaviour
 
         for (int i = 0; i < gameObjects.Count; i++)
         {
-            StartCoroutine(Utils.MoveObject(gameObjects[i], 
-                new(i == 1 ? gameObjects[i].GetComponent<RectTransform>().anchoredPosition.x : gameObjects[i].transform.position.x, 
-                targetYPos[i]), duration[i], 
+            StartCoroutine(Utils.MoveObject(gameObjects[i],
+                new(i == 1 ? gameObjects[i].GetComponent<RectTransform>().anchoredPosition.x : gameObjects[i].transform.position.x,
+                targetYPos[i]), duration[i],
                 isCanvasObject: i == 1));
 
             if (i == 1)

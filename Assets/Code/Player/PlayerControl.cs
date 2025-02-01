@@ -64,7 +64,7 @@ public class PlayerControl : MonoBehaviour
         {
             endTouchPosition = touch.position;
             jumpVector = startTouchPosition - endTouchPosition;
-            jumpVector = jumpVector.normalized * jumpVector.magnitude * 3; //Change later
+            jumpVector = jumpVector.normalized * jumpVector.magnitude * 3;
         }
 
         return jumpVector;

@@ -8,6 +8,7 @@ TagManager:
   - BPlatform
   - Score
   - Buttons
+  - Continue
   layers:
   - Default
   - TransparentFX

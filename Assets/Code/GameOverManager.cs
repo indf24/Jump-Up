@@ -24,7 +24,7 @@ public class GameOverManager : MonoBehaviour
     [SerializeField] private GameObject platform;
 
     [SerializeField] private GameObject continueText;
-    [SerializeField] private Button continueButton;
+    [SerializeField] private GameObject continueButton;
 
     private bool firstTry = true;
     private bool secondChanceReady = false;
@@ -53,6 +53,11 @@ public class GameOverManager : MonoBehaviour
                 {
                     StartCoroutine(NoSecondChance());
                 }
+                else if (hit.collider.CompareTag("Continue"))
+                {
+                    continueButton.GetComponent<Collider2D>().enabled = false;
+                    LevelPlayManager.instance.ShowRewardedVideo();
+                }
             }
         }
     }
@@ -62,18 +67,13 @@ public class GameOverManager : MonoBehaviour
         FreezeBall();
 
         continueText.SetActive(true);
-        continueButton.gameObject.SetActive(true);
-
-        continueButton.onClick.AddListener(() =>
-        {
-            Debug.Log("Continue button clicked!");
-            LevelPlayManager.instance.ShowRewardedVideo();
-        });
+        continueButton.SetActive(true);
 
         yield return StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000f), 0.5f, Utils.TransformType.Ease, true));
         yield return StartCoroutine(Utils.MoveObject(ball, new Vector2(0, 15), 0.8f, Utils.TransformType.Ease));
         yield return StartCoroutine(Utils.ScaleObject(ball, new Vector2(15, 15), 0.8f, Utils.TransformType.Ease));
 
+        continueButton.GetComponent<Collider2D>().enabled = true;
         secondChanceReady = true;
     }
 

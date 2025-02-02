@@ -146,6 +146,7 @@ public class LevelPlayManager : MonoBehaviour
 
     public void ShowRewardedVideo()
     {
+        Debug.Log("Checking for ready ad...");
         if (rewardedAd.IsAdReady())
         {
             Debug.Log("Showing video ad");
@@ -168,6 +169,7 @@ public class LevelPlayManager : MonoBehaviour
         Debug.Log($"Video ad closed: {adInfo}");
         ShowBanner();
 
+        rewardedAd.LoadAd();
         EventHub.SecondChance();
     }
 

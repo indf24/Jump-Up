@@ -5,47 +5,52 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+    internal static PlayerManager instance;
+
     [SerializeField] private Rigidbody2D playerRb;
     [SerializeField] private Collider2D playerCollider;
     [SerializeField] private Transform sprite;
     [SerializeField] private Animator animator;
 
-    public static bool PlayerInputAllowed { get; set; } = false;
+    internal static bool PlayerInputAllowed { get; set; } = false;
 
     private RaycastHit2D hit;
 
-    private void Start() => EnableInput();
-
-    private void OnEnable()
+    private void Start()
     {
-        EventHub.OnPlatformCollision += StartPlatformCollision;
-        EventHub.RunPlayerAnimation += PlayerAnimation;
-    }
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
-    private void OnDisable()
-    {
-        EventHub.OnPlatformCollision -= StartPlatformCollision;
-        EventHub.RunPlayerAnimation -= PlayerAnimation;
-    }
+        instance = this;
 
-    private void OnDestroy()
-    {
-        EventHub.OnPlatformCollision -= StartPlatformCollision;
-        EventHub.RunPlayerAnimation -= PlayerAnimation;
+        EnableInput();
     }
 
     private void Update() => sprite.rotation = Quaternion.identity;
 
-    // Methods to safely modify the value
-    public static void EnableInput() => PlayerInputAllowed = true;
-    public static void DisableInput() => PlayerInputAllowed = false;
+    internal static void EnableInput() => PlayerInputAllowed = true;
+    internal static void DisableInput() => PlayerInputAllowed = false;
 
-    // Stops the player
-    private void StopMovement()
-    { 
-        playerRb.constraints |= RigidbodyConstraints2D.FreezePositionX;
-        playerRb.velocity = Vector2.zero;
+    internal GameObject GetPlayerObject() => playerRb.gameObject;
+
+    internal void ResetPlayer()
+    {
+        FreezePlayer();
+        playerRb.transform.position = new(0f, -1.25f);
+        playerRb.transform.SetParent(PlatformManager.instance.bottomPlatform.transform);
     }
+
+    internal void FreezePlayer()
+    {
+        playerRb.velocity = Vector2.zero;
+        playerRb.rotation = 0;
+        playerRb.constraints = RigidbodyConstraints2D.FreezeAll;
+    }
+
+    internal void UnfreezePlayer() => playerRb.constraints = RigidbodyConstraints2D.None;
 
     // Checks if the player is in contact the top of a platform  
     private bool IsGrounded() => hit.collider != null && hit.collider.CompareTag("Platform");
@@ -60,7 +65,7 @@ public class PlayerManager : MonoBehaviour
         Debug.DrawRay(rayOrigin, Vector2.down * rayDistance, Color.red, 0.1f);
     }
 
-    private void StartPlatformCollision() => StartCoroutine(PlatformCollision());
+    internal void StartPlatformCollision() => StartCoroutine(PlatformCollision());
 
     private IEnumerator PlatformCollision()
     {
@@ -75,8 +80,9 @@ public class PlayerManager : MonoBehaviour
 
             if (IsGrounded())
             {
-                StopMovement();
-                EventHub.PlayerLand(1);
+                FreezePlayer();
+                PlatformManager.instance.StartMovePlatform();
+                ScoreManager.instance.AddPoints(1);
                 yield break;
             }
 
@@ -85,5 +91,5 @@ public class PlayerManager : MonoBehaviour
         }
     }
 
-    private void PlayerAnimation(string animation, bool state) => animator.SetBool(animation, state);
+    internal void PlayerAnimation(string animation, bool state) => animator.SetBool(animation, state);
 }

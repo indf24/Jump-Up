@@ -2,72 +2,71 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
 {
-    [SerializeField] private TrajectoryManager trajectoryManager;
-
     [SerializeField] private Rigidbody2D player;
-
-    Touch touch = new();
 
     private Vector2 startTouchPosition;
     private Vector2 endTouchPosition;
 
-    private int minJumpForce = 150;
-    private int maxJumpForce = 1350;
+    private const int minJumpForce = 150;
+    private const int maxJumpForce = 1350;
 
     // Manages the entire player control by detecting screen touch
     void Update()
     {
-        if (PlayerManager.PlayerInputAllowed && Input.touchCount > 0)
+        if (Input.touchCount == 0 || !PlayerManager.PlayerInputAllowed) return;
+
+        Touch touch = Input.GetTouch(0);
+        Vector2 jumpVector = CalculateJump(touch);
+
+        if (jumpVector.y < minJumpForce)
         {
-            touch = Input.GetTouch(0);
-            Vector2 jumpVector = CalculateJump(touch);
+            TrajectoryManager.instance.DespawnBars();
+            PlayerManager.instance.PlayerAnimation("Holding", false);
+            return;
+        }
 
-            // Enables the jump if its force is above a threshold
-            if (jumpVector.y > minJumpForce)
-            {
-                EventHub.PlayerAnimation("Holding", true);
+        PlayerManager.instance.PlayerAnimation("Holding", true);
 
-                jumpVector = LimitJumpForce(jumpVector);
+        jumpVector = LimitJumpForce(jumpVector);
 
-                if (touch.phase == TouchPhase.Moved)
-                {   
-                    trajectoryManager.MakeTrajectory(player, jumpVector, minJumpForce, maxJumpForce);
-                }
+        switch (touch.phase)
+        {
+            case TouchPhase.Moved:
+                TrajectoryManager.instance.MakeTrajectory(player, jumpVector, minJumpForce, maxJumpForce);
+                break;
 
-                if (touch.phase == TouchPhase.Ended)
-                {
-                    trajectoryManager.DespawnBars();
-                    Jump(jumpVector);
-                    PlayerManager.DisableInput();
-                    EventHub.PlayerJump();
-                    EventHub.PlayerAnimation("Flying", true);
-                    EventHub.PlayerAnimation("Holding", false);
-                }
-            }
-            else
-            {
-                trajectoryManager.DespawnBars();
-                EventHub.PlayerAnimation("Holding", false);
-            }
+            case TouchPhase.Ended:
+                TrajectoryManager.instance.DespawnBars();
+                Jump(jumpVector);
+
+                PlayerManager.DisableInput();
+
+                PlatformManager.instance.DespawnPlatform();
+                TrajectoryManager.instance.DespawnBars();
+
+                PlayerManager.instance.PlayerAnimation("Flying", true);
+                PlayerManager.instance.PlayerAnimation("Holding", false);
+                break;
         }
     }
 
     private Vector2 CalculateJump(Touch touch)
     {
-        Vector2 jumpVector = Vector2.zero;
-
-        if (touch.phase == TouchPhase.Began)
+        switch (touch.phase)
         {
-            startTouchPosition = touch.position;
-        }
-        else
-        {
-            endTouchPosition = touch.position;
-            jumpVector = startTouchPosition - endTouchPosition;
-            jumpVector = jumpVector.normalized * jumpVector.magnitude * 3;
-        }
+            case TouchPhase.Began:
+                startTouchPosition = touch.position;
+                return Vector2.zero;
 
-        return jumpVector;
+            case TouchPhase.Stationary:
+            case TouchPhase.Moved:
+            case TouchPhase.Ended:
+                endTouchPosition = touch.position;
+                return (startTouchPosition - endTouchPosition) * 3;
+
+            default:
+                return Vector2.zero;
+        }
     }
 
     private Vector2 LimitJumpForce(Vector2 jumpVector) => jumpVector.normalized * Mathf.Clamp(jumpVector.magnitude, minJumpForce, maxJumpForce);
@@ -76,11 +75,10 @@ public class PlayerControl : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Platform"))
-        {
-            EventHub.PlayerAnimation("Holding", false);
-            EventHub.PlayerAnimation("Flying", false);
-            EventHub.PlatformCollision();
-        }
+        if (!collision.gameObject.CompareTag("Platform")) return;
+
+        PlayerManager.instance.PlayerAnimation("Holding", false);
+        PlayerManager.instance.PlayerAnimation("Flying", false);
+        PlayerManager.instance.StartPlatformCollision();
     }
 }

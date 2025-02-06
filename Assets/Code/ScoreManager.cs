@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class ScoreManager : MonoBehaviour
 {
+    internal static ScoreManager instance;
+
     [SerializeField] private TextMeshProUGUI currentScore;
     private int score;
     private int highscore;
@@ -10,34 +12,21 @@ public class ScoreManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI finalScore;
     [SerializeField] private TextMeshProUGUI bestScore;
 
-    private void Start() => highscore = PlayerPrefs.GetInt("Highscore", 0);
-
-    private void OnEnable()
+    private void Start()
     {
-        EventHub.OnScoreEarned += AddPoints;
-        EventHub.OnGameOver += UpdateHighscore;
-        EventHub.OnGameOver += UpdateGameOverScores;
-        EventHub.OnRetry += ResetCurrentScore;
-    }
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
-    private void OnDisable()
-    {
-        EventHub.OnScoreEarned -= AddPoints;
-        EventHub.OnGameOver -= UpdateHighscore;
-        EventHub.OnGameOver -= UpdateGameOverScores;
-        EventHub.OnRetry -= ResetCurrentScore;
-    }
+        instance = this;
 
-    private void OnDestroy()
-    {
-        EventHub.OnScoreEarned -= AddPoints;
-        EventHub.OnGameOver -= UpdateHighscore;
-        EventHub.OnGameOver -= UpdateGameOverScores;
-        EventHub.OnRetry -= ResetCurrentScore;
+        highscore = PlayerPrefs.GetInt("Highscore", 0);
     }
 
     // Adds points to the score
-    private void AddPoints(int points)
+    internal void AddPoints(int points)
     {
         score += points;
         UpdateScore();
@@ -47,7 +36,7 @@ public class ScoreManager : MonoBehaviour
     private void UpdateScore() => currentScore.text = score.ToString();
 
     // Update the high score on game over
-    private void UpdateHighscore()
+    internal void UpdateHighscore()
     {
         if (score > highscore)
         {
@@ -56,11 +45,11 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
-    private void UpdateGameOverScores()
+    internal void UpdateGameOverScores()
     {
         finalScore.text = score.ToString();
         bestScore.text = highscore.ToString();
     }
 
-    private void ResetCurrentScore() => currentScore.text = "0";
+    internal void ResetCurrentScore() => currentScore.text = "0";
 }

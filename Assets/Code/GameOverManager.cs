@@ -1,16 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class GameOverManager : MonoBehaviour
 {
-    [SerializeField] private GameObject gameOverButtons;
+    internal static GameOverManager instance;
+
     [SerializeField] private Button retryButton;
     [SerializeField] private Button menuButton;
 
     [SerializeField] private GameObject currentScore;
-    [SerializeField] private GameObject UIBall;
+    [SerializeField] private GameObject menuBall;
 
     [SerializeField] private List<GameObject> gameElements;
     private List<float> targetPositionsEnter = new() { -375f, -350f, -440f, -425f };
@@ -20,74 +22,81 @@ public class GameOverManager : MonoBehaviour
 
     [SerializeField] private List<GameObject> menuElements;
 
-    [SerializeField] private GameObject ball;
     [SerializeField] private GameObject platform;
 
-    [SerializeField] private GameObject continueText;
-    [SerializeField] private GameObject continueButton;
+    [SerializeField] private GameObject UIBall;
+    [SerializeField] private Button continueButton;
 
     private bool firstTry = true;
     private bool secondChanceReady = false;
 
     private void Start()
     {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        instance = this;
         retryButton.onClick.AddListener(() => StartCoroutine(Retry()));
         menuButton.onClick.AddListener(() => Menu());
-
-        EventHub.OnSecondChance += StartSecondChance;
     }
 
     private void Update()
     {
         // Check if there is at least one touch
-        if (Input.touchCount > 0 && secondChanceReady)
-        {
-            Touch touch = Input.GetTouch(0);
+        if (Input.touchCount == 0 || !secondChanceReady) return;
 
-            if (touch.phase == TouchPhase.Began)
-            {
-                Vector2 touchPosition = Camera.main.ScreenToWorldPoint(touch.position);
-                RaycastHit2D hit = Physics2D.Raycast(touchPosition, Vector2.zero);
-                
-                if (hit.collider == null)
-                {
-                    StartCoroutine(NoSecondChance());
-                }
-                else if (hit.collider.CompareTag("Continue"))
-                {
-                    continueButton.GetComponent<Collider2D>().enabled = false;
-                    LevelPlayManager.instance.ShowRewardedVideo();
-                }
-            }
-        }
+        Touch touch = Input.GetTouch(0);
+
+        if (touch.phase != TouchPhase.Began) return;
+
+        bool UITapped = EventSystem.current.IsPointerOverGameObject(touch.fingerId);
+
+        if (UITapped) return;
+
+        StartCoroutine(NoSecondChance());
     }
 
     private IEnumerator ContinueScreen()
     {
-        FreezeBall();
+        GameObject player = PlayerManager.instance.GetPlayerObject();
 
-        continueText.SetActive(true);
-        continueButton.SetActive(true);
+        PlayerManager.instance.FreezePlayer();
 
+        UIBall.SetActive(true);
+        UIBall.GetComponent<RectTransform>().anchoredPosition = Utils.ConvertPositionToCanvas(player.transform.position);
+        player.transform.position = new(0f, -1.25f);
         yield return StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000f), 0.5f, Utils.TransformType.Ease, true));
-        yield return StartCoroutine(Utils.MoveObject(ball, new Vector2(0, 15), 0.8f, Utils.TransformType.Ease));
-        yield return StartCoroutine(Utils.ScaleObject(ball, new Vector2(15, 15), 0.8f, Utils.TransformType.Ease));
+        yield return StartCoroutine(Utils.MoveObject(UIBall, new(0, 0), 0.8f, Utils.TransformType.Ease, true));
+        yield return StartCoroutine(Utils.ScaleObject(UIBall, new(15, 15), 0.8f, Utils.TransformType.Ease, true));
 
-        continueButton.GetComponent<Collider2D>().enabled = true;
         secondChanceReady = true;
+
+        continueButton.onClick.AddListener(() =>
+#if UNITY_EDITOR
+        {
+            GameOverManager.instance.StartSecondChance();
+            PlatformManager.instance.StartSecondChance();
+        });
+#else
+        LevelPlayManager.instance.ShowRewardedVideo());
+#endif
     }
 
-    private void StartSecondChance() => StartCoroutine(SecondChance());
+    internal void StartSecondChance() => StartCoroutine(SecondChance());
 
     private IEnumerator SecondChance()
     {
         secondChanceReady = false;
 
-        continueText.SetActive(false);
-        continueButton.gameObject.SetActive(false);
+        yield return new WaitForSeconds(0.5f);
 
-        yield return StartCoroutine(Utils.ScaleObject(ball, new Vector2(1, 1), 0.8f, Utils.TransformType.Ease));
-        UnfreezeBall();
+        yield return StartCoroutine(Utils.ScaleObject(UIBall, new(1, 1), 0.8f, Utils.TransformType.Ease, true));  
+        PlayerManager.instance.GetPlayerObject().transform.position = new(0, 15);
+        UIBall.SetActive(false);
+        PlayerManager.instance.UnfreezePlayer();
         yield return StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 850), 0.7f, isCanvasObject: true));
 
         PlayerManager.EnableInput();
@@ -97,17 +106,16 @@ public class GameOverManager : MonoBehaviour
     {
         secondChanceReady = false;
 
-        continueText.SetActive(false);
-        continueButton.gameObject.SetActive(false);
-
-        yield return StartCoroutine(Utils.ScaleObject(ball, new Vector2(1, 1), 0.8f, Utils.TransformType.Ease));
-        UnfreezeBall();
+        yield return StartCoroutine(Utils.ScaleObject(UIBall, new(1, 1), 0.8f, Utils.TransformType.Ease, true));
+        PlayerManager.instance.GetPlayerObject().transform.position = new(0, 15);
+        UIBall.SetActive(false);
+        PlayerManager.instance.UnfreezePlayer();
         platform.SetActive(false);
     }
 
     private IEnumerator GameOverScreen()
     {
-        ResetBall();
+        PlayerManager.instance.ResetPlayer();
         yield return StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000f), 0.5f, Utils.TransformType.Ease, true));
         StartCoroutine(ShowGameOverUI());
     }
@@ -116,7 +124,10 @@ public class GameOverManager : MonoBehaviour
     {
         HideGameOverUI();
         StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 850f), 0.7f, isCanvasObject: true));
-        EventHub.Retry();
+
+        PlatformManager.instance.ShowBottomPlatform();
+        ScoreManager.instance.ResetCurrentScore();
+
         yield return new WaitForSeconds(0.8f);
 
         SceneControl.ReloadScene();
@@ -128,27 +139,6 @@ public class GameOverManager : MonoBehaviour
         StartCoroutine(LoadMenu());
     }
 
-    private void ResetBall()
-    {
-        FreezeBall();
-        ball.transform.position = new Vector2(0f, -1.25f);
-        ball.transform.parent = platform.transform;
-    }
-
-    private void FreezeBall()
-    {
-        Rigidbody2D rb = ball.GetComponent<Rigidbody2D>();
-        rb.velocity = Vector2.zero;
-        rb.rotation = 0;
-        rb.constraints = RigidbodyConstraints2D.FreezeAll;
-    }
-
-    private void UnfreezeBall()
-    {
-        Rigidbody2D rb = ball.GetComponent<Rigidbody2D>();
-        rb.constraints = RigidbodyConstraints2D.None;
-    }
-
     private IEnumerator ShowGameOverUI()
     {
         for (int i = 0; i < gameElements.Count; i++)
@@ -157,7 +147,7 @@ public class GameOverManager : MonoBehaviour
             yield return new WaitForSeconds(delays[i]);
         }
 
-        StartCoroutine(Utils.MoveObject(UIBall, new(600f, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, Utils.TransformType.Ease, true));
+        StartCoroutine(Utils.MoveObject(menuBall, new(600f, menuBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, Utils.TransformType.Ease, true));
     }
 
     private void HideGameOverUI()
@@ -167,7 +157,7 @@ public class GameOverManager : MonoBehaviour
             StartCoroutine(Utils.MoveObject(gameElements[i], new(targetPositionsLeave[i], gameElements[i].GetComponent<RectTransform>().anchoredPosition.y), moveDuration, Utils.TransformType.Ease, true));
         }
 
-        StartCoroutine(Utils.MoveObject(UIBall, new(950f, UIBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, Utils.TransformType.Ease, true));
+        StartCoroutine(Utils.MoveObject(menuBall, new(950f, menuBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, Utils.TransformType.Ease, true));
     }
 
     private IEnumerator LoadMenu()
@@ -197,10 +187,13 @@ public class GameOverManager : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         PlayerManager.DisableInput();
-        EventHub.PlayerAnimation("Flying", false);
-        EventHub.GameOver();
+        PlayerManager.instance.PlayerAnimation("Flying", false);
 
-        if (firstTry)
+        PlatformManager.instance.GameOver();
+        ScoreManager.instance.UpdateHighscore();
+        ScoreManager.instance.UpdateGameOverScores();
+
+        if (firstTry) //&& LevelPlayManager.instance.rewardedAd.IsAdReady())
         {
             StartCoroutine(ContinueScreen());
             firstTry = false;
@@ -210,6 +203,4 @@ public class GameOverManager : MonoBehaviour
             StartCoroutine(GameOverScreen());
         }
     }
-
-    private void OnDestroy() => EventHub.OnSecondChance -= StartSecondChance;
 }

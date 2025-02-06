@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,20 +7,31 @@ using UnityEngine;
 
 public class TrajectoryManager : MonoBehaviour
 {
+    internal static TrajectoryManager instance;
+
     [SerializeField] private GameObject trajectoryBarPrefab;
     [SerializeField] private GameObject trajectoryFilledBarPrefab;
-    private int poolSize = 10;
+
+    private const int poolSize = 10;
+
     private Queue<TrajectoryBar> trajectoryBarPool = new();
     private Queue<TrajectoryBar> trajectoryFilledBarPool = new();
-    private int maxTrajectorySteps = 10;
+    private const int maxTrajectorySteps = 10;
 
-    private void Start() => CreatePool();
+    private enum BarType { Emtpy, Filled };
 
-    private void OnEnable() => EventHub.OnPlayerJump += DespawnBars;
+    private void Start()
+    {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
-    private void OnDisable() => EventHub.OnPlayerJump -= DespawnBars;
+        instance = this;
 
-    private void OnDestroy() => EventHub.OnPlayerJump -= DespawnBars;
+        CreatePool();
+    }
 
     // Creates a pool of trajectory bars to use throughout the game
     private void CreatePool()
@@ -29,6 +41,7 @@ public class TrajectoryManager : MonoBehaviour
             TrajectoryBar bar = Instantiate(trajectoryBarPrefab).GetComponent<TrajectoryBar>();
             bar.Despawn();
             trajectoryBarPool.Enqueue(bar);
+
             bar = Instantiate(trajectoryFilledBarPrefab).GetComponent<TrajectoryBar>();
             bar.Despawn();
             trajectoryFilledBarPool.Enqueue(bar);
@@ -82,37 +95,20 @@ public class TrajectoryManager : MonoBehaviour
 
         for (int i = 1; i < steps; i += sampleRate)
         {
-            TrajectoryBar bar = SpawnBar(trajectoryPoints[i], "filled");
+            TrajectoryBar bar = SpawnBar(trajectoryPoints[i], BarType.Filled);
             bar.transform.parent = transform;
         }
     }
 
-    // Spawns a trajectory bar from the pool if any are available, otherwise instantiate a new one and spawn that one
-    private TrajectoryBar SpawnBar(Vector2 spawnPosition, string type = "empty")
+    private TrajectoryBar GetTrajectoryBar(Queue<TrajectoryBar> pool, GameObject prefab) => pool.Any() ? pool.Dequeue() : Instantiate(prefab).GetComponent<TrajectoryBar>();
+
+    private TrajectoryBar SpawnBar(Vector2 spawnPosition, BarType type = BarType.Emtpy)
     {
-        TrajectoryBar bar;
-        if (type == "empty")
+        TrajectoryBar bar = type switch
         {
-            if (trajectoryBarPool.Any())
-            {
-                bar = trajectoryBarPool.Dequeue();
-            }
-            else
-            {
-                bar = Instantiate(trajectoryFilledBarPrefab).GetComponent<TrajectoryBar>();
-            }
-        }
-        else
-        {
-            if (trajectoryFilledBarPool.Any())
-            {
-                bar = trajectoryFilledBarPool.Dequeue();
-            }
-            else
-            {
-                bar = Instantiate(trajectoryBarPrefab).GetComponent<TrajectoryBar>();
-            }
-        }
+            BarType.Emtpy => GetTrajectoryBar(trajectoryBarPool, trajectoryBarPrefab),
+            BarType.Filled => GetTrajectoryBar(trajectoryFilledBarPool, trajectoryFilledBarPrefab),
+        };
 
         bar.Spawn(spawnPosition);
         return bar;
@@ -125,6 +121,7 @@ public class TrajectoryManager : MonoBehaviour
         {
             TrajectoryBar bar = transform.GetChild(i).GetComponent<TrajectoryBar>();
             bar.Despawn();
+
             if (bar.name.Contains("Filled"))
             {
                 trajectoryFilledBarPool.Enqueue(bar);

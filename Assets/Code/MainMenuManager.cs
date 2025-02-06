@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -22,60 +23,39 @@ public class MainMenuManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.touchCount > 0 && PlayerManager.PlayerInputAllowed)
-        {
-            Touch touch = Input.GetTouch(0);
+        if (Input.touchCount == 0 || !PlayerManager.PlayerInputAllowed) return;
 
-            if (touch.phase is TouchPhase.Began)
-            {
+        Touch touch = Input.GetTouch(0);
+
+        switch (touch.phase)
+        {
+            case TouchPhase.Began:
                 startTouchPosition = touch.position;
-            }
-            else if (touch.phase is not TouchPhase.Ended)
-            {
+                break;
+
+            case TouchPhase.Moved:
                 Vector2 endTouchPosition = touch.position;
 
                 if (Vector2.Distance(startTouchPosition, endTouchPosition) > 30f && start)
                 {
                     start = false;
                 }
-            }
 
-            if (touch.phase is TouchPhase.Ended)
-            {
-                // Get the touch position in screen coordinates
-                Vector2 touchPosition = touch.position;
+                break;
 
-                // Create a PointerEventData to check for UI elements
-                PointerEventData eventData = new(EventSystem.current)
-                {
-                    position = touchPosition
-                };
+            case TouchPhase.Ended:
+                bool buttonTap = EventSystem.current.IsPointerOverGameObject(touch.fingerId);
 
-                List<RaycastResult> results = new();
-                EventSystem.current.RaycastAll(eventData, results);
-
-                // Check if any UI element was hit
-                bool hitUI = false;
-                foreach (RaycastResult result in results)
-                {
-                    if (result.gameObject.CompareTag("Buttons"))
-                    {
-                        hitUI = true;
-                        break;
-                    }
-                }
-
-                // If no UI element was hit, handle the click
-                if (!hitUI && start)
-                {
-                    PlayerManager.DisableInput();
-                    StartCoroutine(LoadGame());
-                }
-                else
+                if (buttonTap || !start)
                 {
                     start = true;
+                    return;
                 }
-            }
+
+                PlayerManager.DisableInput();
+                StartCoroutine(LoadGame());
+
+                break;
         }
     }
 
@@ -84,22 +64,19 @@ public class MainMenuManager : MonoBehaviour
         StopCoroutine(blinkingPlayText);
         StartCoroutine(Utils.ChangeOpacityOverTime(playText, 0f, 0.5f));
 
-        List<float> targetYPos = new() { 35f, 50f, 5.75f };
-        List<float> duration = new() { 0.7f, 0.2f, 0.7f };
+        List<float> targetYPos = new() { 35f, 50f };
+        List<float> duration = new() { 0.7f, 0.2f };
 
         for (int i = 0; i < gameObjects.Count; i++)
         {
             StartCoroutine(Utils.MoveObject(gameObjects[i],
-                new(i == 1 ? gameObjects[i].GetComponent<RectTransform>().anchoredPosition.x : gameObjects[i].transform.position.x,
-                targetYPos[i]), duration[i],
+                new(i == 1 ? gameObjects[i].GetComponent<RectTransform>().anchoredPosition.x : gameObjects[i].transform.position.x, targetYPos[i]), 
+                duration[i],
                 isCanvasObject: i == 1));
-
-            if (i == 1)
-            {
-                yield return new WaitForSeconds(0.5f);
-            }
         }
 
+        yield return new WaitForSeconds(0.5f);
+        PlatformManager.instance.ShowBottomPlatform();
         yield return new WaitForSeconds(0.7f);
 
         SceneControl.LoadScene("GameMode1");

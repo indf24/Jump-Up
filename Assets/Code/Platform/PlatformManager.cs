@@ -5,157 +5,139 @@ using UnityEngine;
 
 public class PlatformManager : MonoBehaviour
 {
-    [SerializeField] private GameObject player;
+    internal static PlatformManager instance;
 
+    [SerializeField] private GameObject player;  
     [SerializeField] private GameObject platformPrefab;
     private Queue<Platform> platformPool = new();
 
-    [SerializeField] private Platform bottomPlatform;
+    [SerializeField] internal Platform bottomPlatform;
     private Platform currentPlatform;
     private Platform nextPlatform;
 
     private bool MovePlatformActive = false;
 
+    private const float bottomPlatformXPos = 0;
+
     private void Start()
     {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        instance = this;
+
         currentPlatform = bottomPlatform;
         CreatePool();
         SpawnPlatform();
     }
 
-    private void OnEnable()
-    {
-        EventHub.OnPlayerLanding += StartMovePlatform;
-        EventHub.OnPlayerJump += DespawnPlatform;
-        EventHub.OnGameOver += GameOver;
-        EventHub.OnRetry += ShowBottomPatform;
-        EventHub.OnSecondChance += StartSecondChance;
-    }
-
-    private void OnDisable()
-    {
-        EventHub.OnPlayerLanding -= StartMovePlatform;
-        EventHub.OnPlayerJump -= DespawnPlatform;
-        EventHub.OnGameOver -= GameOver;
-        EventHub.OnRetry -= ShowBottomPatform;
-        EventHub.OnSecondChance -= StartSecondChance;
-    }
-
-    private void OnDestroy()
-    {
-        EventHub.OnPlayerLanding -= StartMovePlatform;
-        EventHub.OnPlayerJump -= DespawnPlatform;
-        EventHub.OnGameOver -= GameOver;
-        EventHub.OnRetry -= ShowBottomPatform;
-        EventHub.OnSecondChance -= StartSecondChance;
-    }
-
     // Creates a pool of platforms to use throughout the game
-    private void CreatePool() 
+    private void CreatePool()
     {
         int poolSize = 2;
 
         for (int i = 0; i < poolSize; i++)
         {
-            GameObject obj = Instantiate(platformPrefab);
-            Platform platform = obj.GetComponent<Platform>();
+            Platform platform = Instantiate(platformPrefab).GetComponent<Platform>();
             platform.gameObject.SetActive(false);
             platformPool.Enqueue(platform);
         }
     }
 
+    private Platform GetPlatform() => platformPool.Any() ? platformPool.Dequeue() : Instantiate(platformPrefab).GetComponent<Platform>();
+
     // Spawns a platform from the pool if any are available, otherwise instantiate a new one and spawn that one
-    private void SpawnPlatform() 
+    private void SpawnPlatform()
     {
-        if (platformPool.Any())
-        {
-            nextPlatform = platformPool.Dequeue();
-        }
-        else
-        {
-            GameObject obj = Instantiate(platformPrefab);
-            nextPlatform = obj.GetComponent<Platform>();
-        }
+        float playerXPos = player.transform.position.x;
 
-        nextPlatform.Spawn(player.transform.position.x);
+        nextPlatform = GetPlatform();
+        nextPlatform.Spawn(playerXPos);
     }
 
-    private void StartMovePlatform()
+    internal void StartMovePlatform()
     {
-        if (!MovePlatformActive)
-        {
-            StartCoroutine(MovePlatform());
-        }
-    }
+        if (MovePlatformActive) return;
 
-    // Moves the platfrom where the player land downwards to a predefined position
-    public IEnumerator MovePlatform() 
-    {
         MovePlatformActive = true;
-
-        currentPlatform = nextPlatform;
-
-        // Makes the player a child object of the current platform to make them move together
-        player.transform.parent = currentPlatform.transform; 
-
-        yield return new WaitForSeconds(0.5f);
-
-        Vector2 targetPos = new(currentPlatform.transform.position.x, 5.75f);
-        float duration = 0.7f;
-
-        currentPlatform.Move(targetPos, duration);
-        yield return new WaitForSeconds(duration);
-
-        player.transform.parent = null;
-        player.GetComponent<Rigidbody2D>().constraints &= ~RigidbodyConstraints2D.FreezePositionX;
-
-        SpawnPlatform();
-        PlayerManager.EnableInput();
-
+        StartCoroutine(MovePlatform());
         MovePlatformActive = false;
     }
 
+    // Moves the platfrom where the player land downwards to a predefined position
+    private IEnumerator MovePlatform()
+    {
+        currentPlatform = nextPlatform;
+
+        // Makes the player a child object of the current platform to make them move together
+        player.transform.SetParent(currentPlatform.transform);
+
+        yield return new WaitForSeconds(0.5f);
+
+        float playerXPos = currentPlatform.transform.position.x;
+        float duration = 0.7f;
+
+        Vector2 targetPos = new(playerXPos, 5.75f);
+        currentPlatform.Move(targetPos, duration);
+
+        yield return new WaitForSeconds(duration);
+
+        player.transform.parent = null;
+        PlayerManager.instance.UnfreezePlayer();
+
+        SpawnPlatform();
+        PlayerManager.EnableInput();
+    }
+
     // Despawns the platform the player jumped from
-    private void DespawnPlatform() 
+    internal void DespawnPlatform()
     {
         if (currentPlatform == bottomPlatform)
         {
             StartCoroutine(HideBottomPlatform());
-        }   
-        else
-        {
-            StartCoroutine(currentPlatform.Despawn());
-            platformPool.Enqueue(currentPlatform);
+            return;
         }
+
+        StartCoroutine(currentPlatform.Despawn());
+        platformPool.Enqueue(currentPlatform);
     }
 
     private IEnumerator HideBottomPlatform()
     {
-        Vector2 targetPos = new(bottomPlatform.transform.position.x, -2f);
+        Vector2 targetPos = new(bottomPlatformXPos, -2f);
         bottomPlatform.Move(targetPos, 0.7f);
+
         yield return new WaitForSeconds(0.7f);
-        bottomPlatform.gameObject.SetActive(false);
+
+        bottomPlatform.Hide();
     }
 
-    private void StartSecondChance() => StartCoroutine(SecondChance());
+    internal void StartSecondChance() => StartCoroutine(SecondChance());
 
     private IEnumerator SecondChance()
     {
+        yield return new WaitForSeconds(0.5f);
+
         currentPlatform = bottomPlatform;
-        ShowBottomPatform();
+        ShowBottomPlatform();
+
         yield return new WaitForSeconds(2f);
+
         SpawnPlatform();
     }
 
-    private void GameOver()
+    internal void GameOver()
     {
         StartCoroutine(nextPlatform.Despawn());
-        bottomPlatform.gameObject.SetActive(true);
+        bottomPlatform.Show();
     }
 
-    private void ShowBottomPatform()
+    internal void ShowBottomPlatform()
     {
-        Vector2 targetPos = new(bottomPlatform.transform.position.x, 5.75f);
+        Vector2 targetPos = new(bottomPlatformXPos, 5.75f);
         bottomPlatform.Move(targetPos, 0.7f);
-    } 
+    }
 }

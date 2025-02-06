@@ -7,9 +7,12 @@ using UnityEngine.UI;
 
 public class LevelPlayManager : MonoBehaviour
 {
-    public static LevelPlayManager instance;
+    internal static LevelPlayManager instance;
 
     [SerializeField] private Button continueButton;
+
+    private LevelPlayBannerAd bannerAd;
+    internal LevelPlayRewardedAd rewardedAd;
 
 #if UNITY_ANDROID
     private string appKey = "20c4450e5";
@@ -23,21 +26,16 @@ public class LevelPlayManager : MonoBehaviour
     private string bannerAdUnitId = "unexpected_platform";
 #endif
 
-    private LevelPlayBannerAd bannerAd;
-    private LevelPlayRewardedAd rewardedAd;
-
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (instance != null && instance != this)
         {
             Destroy(gameObject);
             return;
         }
+
+        instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     private void Start()
@@ -144,7 +142,7 @@ public class LevelPlayManager : MonoBehaviour
         Debug.Log("Rewarded Ads Initialized");
     }
 
-    public void ShowRewardedVideo()
+    internal void ShowRewardedVideo()
     {
         Debug.Log("Checking for ready ad...");
         if (rewardedAd.IsAdReady())
@@ -170,7 +168,9 @@ public class LevelPlayManager : MonoBehaviour
         ShowBanner();
 
         rewardedAd.LoadAd();
-        EventHub.SecondChance();
+
+        GameOverManager.instance.StartSecondChance();
+        PlatformManager.instance.StartSecondChance();
     }
 
     private void OnApplicationPause(bool pause) => IronSource.Agent.onApplicationPause(pause);

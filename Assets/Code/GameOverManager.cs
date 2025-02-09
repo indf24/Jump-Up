@@ -24,8 +24,9 @@ public class GameOverManager : MonoBehaviour
 
     [SerializeField] private GameObject platform;
 
-    [SerializeField] private GameObject UIBall;
+    [SerializeField] private GameObject continueBall;
     [SerializeField] private Button continueButton;
+    [SerializeField] private Image continueClose;
 
     private bool firstTry = true;
     private bool secondChanceReady = false;
@@ -41,6 +42,15 @@ public class GameOverManager : MonoBehaviour
         instance = this;
         retryButton.onClick.AddListener(() => StartCoroutine(Retry()));
         menuButton.onClick.AddListener(() => Menu());
+
+        continueButton.onClick.AddListener(() =>
+#if UNITY_EDITOR
+        {
+            GameCoordinator.instance.SecondChance();
+        });
+#else
+        LevelPlayManager.instance.ShowRewardedVideo());
+#endif
     }
 
     private void Update()
@@ -65,24 +75,17 @@ public class GameOverManager : MonoBehaviour
 
         PlayerManager.instance.FreezePlayer();
 
-        UIBall.SetActive(true);
-        UIBall.GetComponent<RectTransform>().anchoredPosition = Utils.ConvertPositionToCanvas(player.transform.position);
+        continueBall.SetActive(true);
+        continueBall.GetComponent<RectTransform>().anchoredPosition = Utils.ConvertPositionToCanvas(player.transform.position);
         player.transform.position = new(0f, -1.25f);
         yield return StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 1000f), 0.5f, Utils.TransformType.Ease, true));
-        yield return StartCoroutine(Utils.MoveObject(UIBall, new(0, 0), 0.8f, Utils.TransformType.Ease, true));
-        yield return StartCoroutine(Utils.ScaleObject(UIBall, new(15, 15), 0.8f, Utils.TransformType.Ease, true));
+        yield return StartCoroutine(Utils.MoveObject(continueBall, new(0, 0), 0.8f, Utils.TransformType.Ease, true));
+        yield return StartCoroutine(Utils.ScaleObject(continueBall, new(15, 15), 0.8f, Utils.TransformType.Ease, true));
+
+        StartCoroutine(Utils.ChangeOpacityOverTime(continueClose, 0.3f, 0.5f));
 
         secondChanceReady = true;
-
-        continueButton.onClick.AddListener(() =>
-#if UNITY_EDITOR
-        {
-            GameOverManager.instance.StartSecondChance();
-            PlatformManager.instance.StartSecondChance();
-        });
-#else
-        LevelPlayManager.instance.ShowRewardedVideo());
-#endif
+        continueButton.interactable = true;
     }
 
     internal void StartSecondChance() => StartCoroutine(SecondChance());
@@ -90,12 +93,18 @@ public class GameOverManager : MonoBehaviour
     private IEnumerator SecondChance()
     {
         secondChanceReady = false;
+        continueButton.interactable = false;
+
+        for (int i = 0; i < continueBall.transform.childCount; i++)
+        {
+            continueBall.transform.GetChild(i).gameObject.SetActive(false);
+        }
 
         yield return new WaitForSeconds(0.5f);
 
-        yield return StartCoroutine(Utils.ScaleObject(UIBall, new(1, 1), 0.8f, Utils.TransformType.Ease, true));  
+        yield return StartCoroutine(Utils.ScaleObject(continueBall, new(1, 1), 0.8f, Utils.TransformType.Ease, true));  
         PlayerManager.instance.GetPlayerObject().transform.position = new(0, 15);
-        UIBall.SetActive(false);
+        continueBall.SetActive(false);
         PlayerManager.instance.UnfreezePlayer();
         yield return StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 850), 0.7f, isCanvasObject: true));
 
@@ -106,9 +115,9 @@ public class GameOverManager : MonoBehaviour
     {
         secondChanceReady = false;
 
-        yield return StartCoroutine(Utils.ScaleObject(UIBall, new(1, 1), 0.8f, Utils.TransformType.Ease, true));
+        yield return StartCoroutine(Utils.ScaleObject(continueBall, new(1, 1), 0.8f, Utils.TransformType.Ease, true));
         PlayerManager.instance.GetPlayerObject().transform.position = new(0, 15);
-        UIBall.SetActive(false);
+        continueBall.SetActive(false);
         PlayerManager.instance.UnfreezePlayer();
         platform.SetActive(false);
     }
@@ -125,8 +134,7 @@ public class GameOverManager : MonoBehaviour
         HideGameOverUI();
         StartCoroutine(Utils.MoveObject(currentScore, new(currentScore.GetComponent<RectTransform>().anchoredPosition.x, 850f), 0.7f, isCanvasObject: true));
 
-        PlatformManager.instance.ShowBottomPlatform();
-        ScoreManager.instance.ResetCurrentScore();
+        GameCoordinator.instance.Retry();
 
         yield return new WaitForSeconds(0.8f);
 
@@ -187,11 +195,7 @@ public class GameOverManager : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         PlayerManager.DisableInput();
-        PlayerManager.instance.PlayerAnimation("Flying", false);
-
-        PlatformManager.instance.GameOver();
-        ScoreManager.instance.UpdateHighscore();
-        ScoreManager.instance.UpdateGameOverScores();
+        GameCoordinator.instance.GameOver();
 
         if (firstTry) //&& LevelPlayManager.instance.rewardedAd.IsAdReady())
         {

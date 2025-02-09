@@ -58,18 +58,12 @@ public class PlatformManager : MonoBehaviour
         nextPlatform.Spawn(playerXPos);
     }
 
-    internal void StartMovePlatform()
-    {
-        if (MovePlatformActive) return;
+    internal void StartNextPlatformSequence() => StartCoroutine(NextPlatformSequence());
 
-        MovePlatformActive = true;
-        StartCoroutine(MovePlatform());
-        MovePlatformActive = false;
-    }
-
-    // Moves the platfrom where the player land downwards to a predefined position
-    private IEnumerator MovePlatform()
+    private IEnumerator NextPlatformSequence()
     {
+        if (MovePlatformActive) yield break;
+
         currentPlatform = nextPlatform;
 
         // Makes the player a child object of the current platform to make them move together
@@ -77,6 +71,20 @@ public class PlatformManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
+        MovePlatformActive = true;
+        yield return StartCoroutine(MovePlatform());
+        MovePlatformActive = false;
+
+        player.transform.parent = null;
+        PlayerManager.instance.UnfreezePlayer();
+
+        SpawnPlatform();
+        PlayerManager.EnableInput();
+    }
+
+    // Moves the platfrom where the player land downwards to a predefined position
+    private IEnumerator MovePlatform()
+    {
         float playerXPos = currentPlatform.transform.position.x;
         float duration = 0.7f;
 
@@ -84,12 +92,6 @@ public class PlatformManager : MonoBehaviour
         currentPlatform.Move(targetPos, duration);
 
         yield return new WaitForSeconds(duration);
-
-        player.transform.parent = null;
-        PlayerManager.instance.UnfreezePlayer();
-
-        SpawnPlatform();
-        PlayerManager.EnableInput();
     }
 
     // Despawns the platform the player jumped from

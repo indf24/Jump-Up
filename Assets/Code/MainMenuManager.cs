@@ -76,7 +76,7 @@ public class MainMenuManager : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.5f);
-        PlatformManager.instance.ShowBottomPlatform();
+        GameCoordinator.instance.PrepareGameMode1();
         yield return new WaitForSeconds(0.7f);
 
         SceneControl.LoadScene("GameMode1");

@@ -20,32 +20,26 @@ public class PlayerControl : MonoBehaviour
 
         if (jumpVector.y < minJumpForce)
         {
-            TrajectoryManager.instance.DespawnBars();
-            PlayerManager.instance.PlayerAnimation("Holding", false);
+            GameCoordinator.instance.PlayerCancelJump();
             return;
         }
 
-        PlayerManager.instance.PlayerAnimation("Holding", true);
+        GameCoordinator.instance.PlayerPrepareJump();
 
         jumpVector = LimitJumpForce(jumpVector);
 
         switch (touch.phase)
         {
             case TouchPhase.Moved:
-                TrajectoryManager.instance.MakeTrajectory(player, jumpVector, minJumpForce, maxJumpForce);
+                GameCoordinator.instance.UpdateTrajectory(player, jumpVector, minJumpForce, maxJumpForce);
                 break;
 
             case TouchPhase.Ended:
-                TrajectoryManager.instance.DespawnBars();
                 Jump(jumpVector);
 
                 PlayerManager.DisableInput();
 
-                PlatformManager.instance.DespawnPlatform();
-                TrajectoryManager.instance.DespawnBars();
-
-                PlayerManager.instance.PlayerAnimation("Flying", true);
-                PlayerManager.instance.PlayerAnimation("Holding", false);
+                GameCoordinator.instance.PlayerJump();
                 break;
         }
     }
@@ -77,8 +71,6 @@ public class PlayerControl : MonoBehaviour
     {
         if (!collision.gameObject.CompareTag("Platform")) return;
 
-        PlayerManager.instance.PlayerAnimation("Holding", false);
-        PlayerManager.instance.PlayerAnimation("Flying", false);
-        PlayerManager.instance.StartPlatformCollision();
+        GameCoordinator.instance.PlayerPlatformCollision();
     }
 }

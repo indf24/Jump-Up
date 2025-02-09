@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Utils : MonoBehaviour
 {
@@ -10,7 +12,7 @@ public class Utils : MonoBehaviour
         Ease
     }
 
-    public static IEnumerator MoveObject(GameObject obj, Vector2 targetPos, float duration, TransformType transformType = TransformType.Normal, bool isCanvasObject = false)
+    internal static IEnumerator MoveObject(GameObject obj, Vector2 targetPos, float duration, TransformType transformType = TransformType.Normal, bool isCanvasObject = false)
     {
         Vector2 startPos = new();
         RectTransform rectTransform = new();
@@ -65,7 +67,7 @@ public class Utils : MonoBehaviour
         }
     }
 
-    public static IEnumerator ScaleObject(GameObject obj, Vector2 targetScaleV2, float duration, TransformType transformType = TransformType.Normal, bool isCanvasObject = false)
+    internal static IEnumerator ScaleObject(GameObject obj, Vector2 targetScaleV2, float duration, TransformType transformType = TransformType.Normal, bool isCanvasObject = false)
     {
         Vector3 startScale;
         Vector3 targetScale = new(targetScaleV2.x, targetScaleV2.y, 1f);
@@ -121,24 +123,46 @@ public class Utils : MonoBehaviour
         }
     }
 
-    public static IEnumerator ChangeOpacityOverTime(TextMeshProUGUI text, float targetOpacity, float duration)
+    internal static IEnumerator ChangeOpacityOverTime(Component targetComponent, float targetOpacity, float duration)
     {
+        Func<float> getAlpha = null;
+        Action<float> setAlpha = null;
+
+        // Determine component type and assign appropriate alpha handlers
+        switch (targetComponent)
+        {
+            case TextMeshProUGUI text:
+                getAlpha = () => text.alpha;
+                setAlpha = (value) => text.alpha = value;
+                break;
+
+            case Image image:
+                getAlpha = () => image.color.a;
+                setAlpha = (value) =>
+                {
+                    Color color = image.color;
+                    color.a = value;
+                    image.color = color;
+                };
+                break;
+        }
+
         float elapsedTime = 0;
-        duration *= 5;
+        float startAlpha = getAlpha();
 
         while (elapsedTime < duration)
         {
             elapsedTime += Time.deltaTime;
-            float t = elapsedTime / duration;
-            text.alpha = Mathf.Lerp(text.alpha, targetOpacity, t);
-
+            float t = Mathf.Clamp01(elapsedTime / duration);
+            float newAlpha = Mathf.Lerp(startAlpha, targetOpacity, t);
+            setAlpha(newAlpha);
             yield return null;
         }
 
-        text.alpha = targetOpacity;
+        setAlpha(targetOpacity);
     }
 
-    public static IEnumerator BlinkText(TextMeshProUGUI text, float blinkTime)
+    internal static IEnumerator BlinkText(TextMeshProUGUI text, float blinkTime)
     {
         blinkTime /= 2;
 
@@ -149,5 +173,5 @@ public class Utils : MonoBehaviour
         }
     }
 
-    public static Vector2 ConvertPositionToCanvas(Vector2 position) => new(position.x * 64, (position.y * 64) - 960);
+    internal static Vector2 ConvertPositionToCanvas(Vector2 position) => new(position.x * 64, (position.y * 64) - 960);
 }

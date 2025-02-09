@@ -169,8 +169,7 @@ public class LevelPlayManager : MonoBehaviour
 
         rewardedAd.LoadAd();
 
-        GameOverManager.instance.StartSecondChance();
-        PlatformManager.instance.StartSecondChance();
+        GameCoordinator.instance.SecondChance();
     }
 
     private void OnApplicationPause(bool pause) => IronSource.Agent.onApplicationPause(pause);

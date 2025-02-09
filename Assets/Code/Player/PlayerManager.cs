@@ -81,8 +81,7 @@ public class PlayerManager : MonoBehaviour
             if (IsGrounded())
             {
                 FreezePlayer();
-                PlatformManager.instance.StartMovePlatform();
-                ScoreManager.instance.AddPoints(1);
+                GameCoordinator.instance.PlayerLand();
                 yield break;
             }
 

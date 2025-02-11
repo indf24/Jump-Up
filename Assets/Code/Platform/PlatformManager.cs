@@ -7,7 +7,7 @@ public class PlatformManager : MonoBehaviour
 {
     internal static PlatformManager instance;
 
-    [SerializeField] private GameObject player;  
+    [SerializeField] private GameObject player;
     [SerializeField] private GameObject platformPrefab;
     private Queue<Platform> platformPool = new();
 
@@ -62,9 +62,12 @@ public class PlatformManager : MonoBehaviour
 
     private IEnumerator NextPlatformSequence()
     {
-        if (MovePlatformActive) yield break;
+        if (MovePlatformActive)
+            yield break;
 
         currentPlatform = nextPlatform;
+
+        currentPlatform.Stop();
 
         // Makes the player a child object of the current platform to make them move together
         player.transform.SetParent(currentPlatform.transform);
@@ -79,7 +82,22 @@ public class PlatformManager : MonoBehaviour
         PlayerManager.instance.UnfreezePlayer();
 
         SpawnPlatform();
+        SetDifficulty();
         PlayerManager.EnableInput();
+    }
+
+    private void SetDifficulty()
+    {
+        int diff = ScoreManager.instance.GetScore() switch
+        {
+            < 20 => 0,
+            >= 20 and < 30 => 1,
+            >= 30 and < 40 => 2,
+            >= 40 and < 50 => 3,
+            >= 50 => 4
+        };
+
+        nextPlatform.Difficulty(diff);
     }
 
     // Moves the platfrom where the player land downwards to a predefined position
@@ -129,6 +147,7 @@ public class PlatformManager : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         SpawnPlatform();
+        SetDifficulty();
     }
 
     internal void GameOver()

@@ -60,7 +60,7 @@ public class Utils : MonoBehaviour
             case true:
                 rectTransform.anchoredPosition = targetPos;
                 break;
-            
+
             case false:
                 obj.transform.position = targetPos;
                 break;
@@ -79,7 +79,7 @@ public class Utils : MonoBehaviour
                 rectTransform = obj.GetComponent<RectTransform>();
                 startScale = rectTransform.localScale;
                 break;
-            
+
             case false:
                 startScale = obj.transform.localScale;
                 break;

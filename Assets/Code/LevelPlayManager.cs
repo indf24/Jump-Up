@@ -2,14 +2,11 @@ using com.unity3d.mediation;
 using GoogleMobileAds.Ump.Api;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LevelPlayManager : MonoBehaviour
 {
     internal static LevelPlayManager instance;
-
-    [SerializeField] private Button continueButton;
 
     private LevelPlayBannerAd bannerAd;
     internal LevelPlayRewardedAd rewardedAd;
@@ -26,7 +23,7 @@ public class LevelPlayManager : MonoBehaviour
     private string bannerAdUnitId = "unexpected_platform";
 #endif
 
-    private void Awake()
+    private void Start()
     {
         if (instance != null && instance != this)
         {
@@ -36,10 +33,7 @@ public class LevelPlayManager : MonoBehaviour
 
         instance = this;
         DontDestroyOnLoad(gameObject);
-    }
 
-    private void Start()
-    {
         //ConsentInformation.Reset();
 
         // Create a ConsentRequestParameters object.
@@ -93,7 +87,7 @@ public class LevelPlayManager : MonoBehaviour
         IronSource.Agent.setMetaData("AdMob_TFCD", "false");
         IronSource.Agent.setMetaData("AdMob_TFUA", "false");
         IronSource.Agent.setMetaData("AdMob_MaxContentRating", "MAX_AD_CONTENT_RATING_MA");
-        IronSource.Agent.setMetaData("is_test_suite", "enable");
+        //IronSource.Agent.setMetaData("is_test_suite", "enable");
 
         LevelPlay.OnInitSuccess += OnInitializationCompleted;
         LevelPlay.OnInitFailed += error => Debug.LogError("Initialization error: " + error);
@@ -105,11 +99,11 @@ public class LevelPlayManager : MonoBehaviour
     {
         Debug.Log("Initialization completed.");
         //IronSource.Agent.launchTestSuite();
-        LoadBanner();
+        InitializeBannerAds();
         InitializeRewardedAds();
     }
 
-    private void LoadBanner()
+    private void InitializeBannerAds()
     {
         bannerAd = new LevelPlayBannerAd(bannerAdUnitId, LevelPlayAdSize.CreateAdaptiveAdSize(), LevelPlayBannerPosition.TopCenter, "Startup", respectSafeArea: true);
 
@@ -136,13 +130,22 @@ public class LevelPlayManager : MonoBehaviour
         rewardedAd.OnAdDisplayFailed += (adInfo) => Debug.Log($"Video ad failed to display: {adInfo}");
         rewardedAd.OnAdRewarded += (adInfo, reward) => Debug.Log($"Video ad reward: {reward}");
         rewardedAd.OnAdClosed += RewardedAdClosed;
-
-        rewardedAd.LoadAd();
+        
+        StartCoroutine(LoadRewardedAd());
 
         Debug.Log("Rewarded Ads Initialized");
     }
 
-    internal void ShowRewardedVideo()
+    private IEnumerator LoadRewardedAd()
+    {
+        while (!rewardedAd.IsAdReady())
+        {
+            rewardedAd.LoadAd();
+            yield return new WaitForSeconds(5f);
+        }
+    }
+
+    internal void ShowRewardedAd()
     {
         Debug.Log("Checking for ready ad...");
         if (rewardedAd.IsAdReady())

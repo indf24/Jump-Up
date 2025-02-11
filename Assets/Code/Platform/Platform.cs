@@ -1,12 +1,11 @@
 using System.Collections;
-using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 
 public class Platform : MonoBehaviour
 {
     private readonly float nextPlatformOffset = 5f;
 
-    private const float xSpawnPosRange = 5.5f;
+    private const float xSpawnPosRange = 6f;
 
     private readonly float ySpawnPosMin = 11.75f;
     private readonly float ySpawnPosMax = 23.75f;
@@ -16,12 +15,12 @@ public class Platform : MonoBehaviour
     // Gets a random position from SpawnPosition() and spawn the platform there
     internal void Spawn(float playerXPos)
     {
-        gameObject.transform.position = SpawnPosition(playerXPos);
+        transform.position = SpawnPosition(playerXPos);
         gameObject.SetActive(true);
     }
 
     // Returns a random position for the next platform
-    private Vector2 SpawnPosition(float playerXPos) 
+    private Vector2 SpawnPosition(float playerXPos)
     {
         Side spawnSide = SpawnSide(playerXPos);
 
@@ -50,10 +49,12 @@ public class Platform : MonoBehaviour
         };
     }
 
+    private Side GetSide() => gameObject.transform.position.x < 0 ? Side.Left : Side.Right;
+
     // Despawns the platform
     internal IEnumerator Despawn()
     {
-        Animator animator = gameObject.GetComponent<Animator>();
+        Animator animator = GetComponent<Animator>();
         animator.SetTrigger("Despawn");
         float despawnTime = animator.GetCurrentAnimatorStateInfo(0).length;
         yield return new WaitForSeconds(despawnTime);
@@ -62,6 +63,59 @@ public class Platform : MonoBehaviour
     }
 
     internal void Move(Vector2 targetPos, float duration) => StartCoroutine(Utils.MoveObject(gameObject, targetPos, duration));
+
+    internal void Difficulty(int diff)
+    {
+        if (diff > 0)
+        {
+            StartCoroutine(PingPongMove(diff));
+        }
+    }
+
+    internal void Stop() => StopAllCoroutines();
+
+    private IEnumerator PingPongMove(float diff)
+    {
+        Side side = GetSide();
+        float platformLength = GetComponent<Collider2D>().bounds.size.x;
+        float leftRange = 0f;
+        float rightRange = 0f;
+
+        switch (side)
+        {
+            case Side.Left:
+                leftRange = Mathf.Max(transform.position.x - platformLength, -xSpawnPosRange);
+                if (leftRange > -6)
+                    rightRange = transform.position.x + platformLength;
+                break;
+
+            case Side.Right:
+                rightRange = Mathf.Min(transform.position.x + platformLength, xSpawnPosRange);
+                if (rightRange < 6)
+                    leftRange = transform.position.x - platformLength;
+                break;
+        }
+
+        float t = 0;
+        float direction = 1;
+        diff /= 5;
+
+        while (true)
+        {
+            t += direction * diff * Time.deltaTime;
+            t = Mathf.Clamp01(t);
+
+            float xPos = Mathf.Lerp(leftRange, rightRange, t);
+            transform.position = new(xPos, transform.position.y);
+
+            if (t is >= 1 or <= 0)
+            {
+                direction *= -1;
+            }
+
+            yield return null;
+        }
+    }
 
     internal void Show() => gameObject.SetActive(true);
 

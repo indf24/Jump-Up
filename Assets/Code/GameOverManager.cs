@@ -49,22 +49,25 @@ public class GameOverManager : MonoBehaviour
             GameCoordinator.instance.SecondChance();
         });
 #else
-        LevelPlayManager.instance.ShowRewardedVideo());
+        LevelPlayManager.instance.ShowRewardedAd());
 #endif
     }
 
     private void Update()
     {
         // Check if there is at least one touch
-        if (Input.touchCount == 0 || !secondChanceReady) return;
+        if (Input.touchCount == 0 || !secondChanceReady)
+            return;
 
         Touch touch = Input.GetTouch(0);
 
-        if (touch.phase != TouchPhase.Began) return;
+        if (touch.phase != TouchPhase.Began)
+            return;
 
         bool UITapped = EventSystem.current.IsPointerOverGameObject(touch.fingerId);
 
-        if (UITapped) return;
+        if (UITapped)
+            return;
 
         StartCoroutine(NoSecondChance());
     }
@@ -102,7 +105,7 @@ public class GameOverManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.5f);
 
-        yield return StartCoroutine(Utils.ScaleObject(continueBall, new(1, 1), 0.8f, Utils.TransformType.Ease, true));  
+        yield return StartCoroutine(Utils.ScaleObject(continueBall, new(1, 1), 0.8f, Utils.TransformType.Ease, true));
         PlayerManager.instance.GetPlayerObject().transform.position = new(0, 15);
         continueBall.SetActive(false);
         PlayerManager.instance.UnfreezePlayer();
@@ -114,6 +117,12 @@ public class GameOverManager : MonoBehaviour
     private IEnumerator NoSecondChance()
     {
         secondChanceReady = false;
+        continueButton.interactable = false;
+
+        for (int i = 0; i < continueBall.transform.childCount; i++)
+        {
+            continueBall.transform.GetChild(i).gameObject.SetActive(false);
+        }
 
         yield return StartCoroutine(Utils.ScaleObject(continueBall, new(1, 1), 0.8f, Utils.TransformType.Ease, true));
         PlayerManager.instance.GetPlayerObject().transform.position = new(0, 15);
@@ -197,7 +206,7 @@ public class GameOverManager : MonoBehaviour
         PlayerManager.DisableInput();
         GameCoordinator.instance.GameOver();
 
-        if (firstTry) //&& LevelPlayManager.instance.rewardedAd.IsAdReady())
+        if (firstTry && LevelPlayManager.instance.rewardedAd.IsAdReady())
         {
             StartCoroutine(ContinueScreen());
             firstTry = false;

@@ -1,8 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 
 public class TrajectoryManager : MonoBehaviour
@@ -51,9 +48,8 @@ public class TrajectoryManager : MonoBehaviour
     // Creates a new trajectory when needed
     public void MakeTrajectory(Rigidbody2D rigidbody, Vector2 jumpVector, int minJumpForce, int maxJumpForce)
     {
-        float jumpMagnitude = jumpVector.magnitude;
-        float steps = maxTrajectorySteps * ((jumpMagnitude - minJumpForce) / (maxJumpForce - minJumpForce));
-        steps = jumpMagnitude >= 1349f ? 10 : Mathf.FloorToInt(Mathf.Clamp(steps, 0, maxTrajectorySteps));
+        float jumpMagnitude = Mathf.Round(jumpVector.magnitude);
+        int steps = Mathf.RoundToInt(maxTrajectorySteps * ((jumpMagnitude - minJumpForce) / (maxJumpForce - minJumpForce)));
 
         DespawnBars();
         List<Vector2> trajectoryPoints = CalculateTrajectory(rigidbody.transform.position, jumpVector);
@@ -116,7 +112,7 @@ public class TrajectoryManager : MonoBehaviour
 
     // Despawns all the trajectory bars
     public void DespawnBars()
-    {  
+    {
         for (int i = 0; i < transform.childCount; i++)
         {
             TrajectoryBar bar = transform.GetChild(i).GetComponent<TrajectoryBar>();
@@ -137,7 +133,7 @@ public class TrajectoryManager : MonoBehaviour
     {
         float angle = (Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg) + 90; // Convert to degrees
         for (int i = 0; i < transform.childCount; i++)
-        { 
+        {
             transform.GetChild(i).rotation = Quaternion.Euler(0, 0, angle); // Apply rotation only on the z-axis
         }
     }

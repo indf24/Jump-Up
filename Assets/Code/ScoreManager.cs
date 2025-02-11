@@ -6,7 +6,7 @@ public class ScoreManager : MonoBehaviour
     internal static ScoreManager instance;
 
     [SerializeField] private TextMeshProUGUI currentScore;
-    private int score;
+    [SerializeField] private int score;
     private int highscore;
 
     [SerializeField] private TextMeshProUGUI finalScore;
@@ -52,4 +52,6 @@ public class ScoreManager : MonoBehaviour
     }
 
     internal void ResetCurrentScore() => currentScore.text = "0";
+
+    internal int GetScore() => score;
 }

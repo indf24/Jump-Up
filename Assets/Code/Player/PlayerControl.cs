@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class PlayerControl : MonoBehaviour
@@ -13,7 +14,8 @@ public class PlayerControl : MonoBehaviour
     // Manages the entire player control by detecting screen touch
     void Update()
     {
-        if (Input.touchCount == 0 || !PlayerManager.PlayerInputAllowed) return;
+        if (Input.touchCount == 0 || !PlayerManager.PlayerInputAllowed)
+            return;
 
         Touch touch = Input.GetTouch(0);
         Vector2 jumpVector = CalculateJump(touch);
@@ -26,7 +28,7 @@ public class PlayerControl : MonoBehaviour
 
         GameCoordinator.instance.PlayerPrepareJump();
 
-        jumpVector = LimitJumpForce(jumpVector);
+        jumpVector = AdjustJumpForce(jumpVector);
 
         switch (touch.phase)
         {
@@ -63,13 +65,25 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
-    private Vector2 LimitJumpForce(Vector2 jumpVector) => jumpVector.normalized * Mathf.Clamp(jumpVector.magnitude, minJumpForce, maxJumpForce);
+    private Vector2 AdjustJumpForce(Vector2 jumpVector)
+    {
+        const int steps = 10;
+
+        float rawMagnitude = jumpVector.magnitude;
+        float clampedMagnitude = Mathf.Clamp(rawMagnitude, minJumpForce, maxJumpForce);
+
+        float stepSize = (maxJumpForce - minJumpForce) / steps;
+        int steppedMagnitude = Mathf.RoundToInt(minJumpForce + (Mathf.Floor((clampedMagnitude - minJumpForce) / stepSize) * stepSize));
+
+        return jumpVector.normalized * steppedMagnitude;
+    }
 
     private void Jump(Vector2 jumpVector) => player.AddForce(jumpVector, ForceMode2D.Impulse);
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!collision.gameObject.CompareTag("Platform")) return;
+        if (!collision.gameObject.CompareTag("Platform"))
+            return;
 
         GameCoordinator.instance.PlayerPlatformCollision();
     }

@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -23,7 +22,8 @@ public class MainMenuManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.touchCount == 0 || !PlayerManager.PlayerInputAllowed) return;
+        if (Input.touchCount == 0 || !PlayerManager.PlayerInputAllowed)
+            return;
 
         Touch touch = Input.GetTouch(0);
 
@@ -70,7 +70,7 @@ public class MainMenuManager : MonoBehaviour
         for (int i = 0; i < gameObjects.Count; i++)
         {
             StartCoroutine(Utils.MoveObject(gameObjects[i],
-                new(i == 1 ? gameObjects[i].GetComponent<RectTransform>().anchoredPosition.x : gameObjects[i].transform.position.x, targetYPos[i]), 
+                new(i == 1 ? gameObjects[i].GetComponent<RectTransform>().anchoredPosition.x : gameObjects[i].transform.position.x, targetYPos[i]),
                 duration[i],
                 isCanvasObject: i == 1));
         }

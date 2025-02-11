@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class GameCoordinator : MonoBehaviour
@@ -16,6 +13,7 @@ public class GameCoordinator : MonoBehaviour
         }
 
         instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     internal void PrepareGameMode1() => PlatformManager.instance.ShowBottomPlatform();

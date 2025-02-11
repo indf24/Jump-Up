@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Xml.Serialization;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
@@ -58,11 +56,11 @@ public class PlayerManager : MonoBehaviour
     // Creates a raycast for detection of contact between the player and a platform
     private void CreateGroudedRay()
     {
-        Vector2 rayOrigin = playerRb.position - new Vector2(0, (playerCollider.bounds.size.y / 2) + 0.002f);
-        float rayDistance = 0.1f;
+        Vector2 rayOrigin = playerRb.position - new Vector2(0, (playerCollider.bounds.size.y / 2) + 0.001f);
+        float rayDistance = 0.01f;
         hit = Physics2D.Raycast(rayOrigin, Vector2.down, rayDistance);
 
-        Debug.DrawRay(rayOrigin, Vector2.down * rayDistance, Color.red, 0.1f);
+        Debug.DrawRay(rayOrigin, Vector2.down * rayDistance, Color.red);
     }
 
     internal void StartPlatformCollision() => StartCoroutine(PlatformCollision());
@@ -72,10 +70,10 @@ public class PlayerManager : MonoBehaviour
         float duration = 1f;
         float elapsedTime = 0f;
 
+        PlayerAnimation("Flying", false);
+
         while (elapsedTime < duration)
         {
-            PlayerAnimation("Flying", false);
-
             CreateGroudedRay();
 
             if (IsGrounded())

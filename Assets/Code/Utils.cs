@@ -145,6 +145,16 @@ public class Utils : MonoBehaviour
                     image.color = color;
                 };
                 break;
+
+            case SpriteRenderer sprite:
+                getAlpha = () => sprite.color.a;
+                setAlpha = (value) =>
+                {
+                    Color color = sprite.color;
+                    color.a = value;
+                    sprite.color = color;
+                };
+                break;
         }
 
         float elapsedTime = 0;

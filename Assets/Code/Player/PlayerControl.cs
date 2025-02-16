@@ -26,6 +26,7 @@ public class PlayerControl : MonoBehaviour
             return;
         }
 
+        GameCoordinator.instance.HideTutorial();
         GameCoordinator.instance.PlayerPrepareJump();
 
         jumpVector = AdjustJumpForce(jumpVector);

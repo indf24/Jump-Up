@@ -158,6 +158,7 @@ public class PlatformManager : MonoBehaviour
 
     internal void ShowBottomPlatform()
     {
+        bottomPlatform.Show();
         Vector2 targetPos = new(bottomPlatformXPos, 5.75f);
         bottomPlatform.Move(targetPos, 0.7f);
     }

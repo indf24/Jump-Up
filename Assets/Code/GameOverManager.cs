@@ -164,11 +164,17 @@ public class GameOverManager : MonoBehaviour
             yield return new WaitForSeconds(delays[i]);
         }
 
-        StartCoroutine(Utils.MoveObject(menuBall, new(600f, menuBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, Utils.TransformType.Ease, true));
+        yield return StartCoroutine(Utils.MoveObject(menuBall, new(600f, menuBall.GetComponent<RectTransform>().anchoredPosition.y), 0.5f, Utils.TransformType.Ease, true));
+
+        retryButton.interactable = true;
+        menuButton.interactable = true;
     }
 
     private void HideGameOverUI()
     {
+        retryButton.interactable = false;
+        menuButton.interactable = false;
+
         for (int i = 0; i < gameElements.Count; i++)
         {
             StartCoroutine(Utils.MoveObject(gameElements[i], new(targetPositionsLeave[i], gameElements[i].GetComponent<RectTransform>().anchoredPosition.y), moveDuration, Utils.TransformType.Ease, true));
@@ -206,7 +212,7 @@ public class GameOverManager : MonoBehaviour
         PlayerManager.DisableInput();
         GameCoordinator.instance.GameOver();
 
-        if (firstTry && LevelPlayManager.instance.rewardedAd.IsAdReady())
+        if (firstTry && LevelPlayManager.instance.IsAdReady())
         {
             StartCoroutine(ContinueScreen());
             firstTry = false;

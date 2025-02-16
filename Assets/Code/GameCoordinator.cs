@@ -70,4 +70,6 @@ public class GameCoordinator : MonoBehaviour
         PlatformManager.instance.ShowBottomPlatform();
         ScoreManager.instance.ResetCurrentScore();
     }
+
+    internal void HideTutorial() => GameSettings.instance.HideTutorial();
 }

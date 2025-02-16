@@ -9,7 +9,9 @@ public class LevelPlayManager : MonoBehaviour
     internal static LevelPlayManager instance;
 
     private LevelPlayBannerAd bannerAd;
-    internal LevelPlayRewardedAd rewardedAd;
+    private LevelPlayRewardedAd rewardedAd;
+
+    private bool adReady = false;
 
 #if UNITY_ANDROID
     private string appKey = "20c4450e5";
@@ -81,12 +83,12 @@ public class LevelPlayManager : MonoBehaviour
     {
         Debug.Log("Intitializing IronSource");
 
-        //IronSource.Agent.validateIntegration();
         IronSource.Agent.shouldTrackNetworkState(true);
         IronSource.Agent.setMetaData("do_not_sell", "true");
         IronSource.Agent.setMetaData("AdMob_TFCD", "false");
         IronSource.Agent.setMetaData("AdMob_TFUA", "false");
         IronSource.Agent.setMetaData("AdMob_MaxContentRating", "MAX_AD_CONTENT_RATING_MA");
+        //IronSource.Agent.validateIntegration();
         //IronSource.Agent.setMetaData("is_test_suite", "enable");
 
         LevelPlay.OnInitSuccess += OnInitializationCompleted;
@@ -105,6 +107,8 @@ public class LevelPlayManager : MonoBehaviour
 
     private void InitializeBannerAds()
     {
+        Debug.Log("Initializing Banner Ads");
+
         bannerAd = new LevelPlayBannerAd(bannerAdUnitId, LevelPlayAdSize.CreateAdaptiveAdSize(), LevelPlayBannerPosition.TopCenter, "Startup", respectSafeArea: true);
 
         bannerAd.OnAdLoaded += (adInfo) => Debug.Log($"Banner loaded: {adInfo}");
@@ -112,6 +116,8 @@ public class LevelPlayManager : MonoBehaviour
         bannerAd.OnAdDisplayed += (adInfo) => Debug.Log($"Banner displayed: {adInfo}");
 
         bannerAd.LoadAd();
+
+        Debug.Log("Banner Ads Initialized");
     }
 
     private void ShowBanner() => bannerAd.ShowAd();
@@ -138,17 +144,24 @@ public class LevelPlayManager : MonoBehaviour
 
     private IEnumerator LoadRewardedAd()
     {
+        adReady = false;
+
         while (!rewardedAd.IsAdReady())
         {
             rewardedAd.LoadAd();
             yield return new WaitForSeconds(5f);
         }
+
+        adReady = true;
     }
+
+    internal bool IsAdReady() => adReady;
 
     internal void ShowRewardedAd()
     {
         Debug.Log("Checking for ready ad...");
-        if (rewardedAd.IsAdReady())
+
+        if (IsAdReady())
         {
             Debug.Log("Showing video ad");
             rewardedAd.ShowAd("Turn_Complete");
@@ -168,9 +181,10 @@ public class LevelPlayManager : MonoBehaviour
     void RewardedAdClosed(LevelPlayAdInfo adInfo)
     {
         Debug.Log($"Video ad closed: {adInfo}");
+        StartCoroutine(GameSettings.instance.CoverScreen());
+        
         ShowBanner();
-
-        rewardedAd.LoadAd();
+        StartCoroutine(LoadRewardedAd());
 
         GameCoordinator.instance.SecondChance();
     }

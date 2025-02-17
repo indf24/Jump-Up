@@ -2,7 +2,6 @@ using com.unity3d.mediation;
 using GoogleMobileAds.Ump.Api;
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class LevelPlayManager : MonoBehaviour
 {
@@ -17,9 +16,6 @@ public class LevelPlayManager : MonoBehaviour
     private string appKey = "20c4450e5";
     private string bannerAdUnitId = "myu5mmnobtfji56s";
     private string videoaAdUnitId = "axnq5x66xc9jp0wn";
-#elif UNITY_IPHONE
-    private string appKey = "8545d445";
-    private string bannerAdUnitId = "iep3rxsyp9na3rw8";
 #else
     private string appKey = "unexpected_platform";
     private string bannerAdUnitId = "unexpected_platform";
@@ -85,14 +81,16 @@ public class LevelPlayManager : MonoBehaviour
 
         IronSource.Agent.shouldTrackNetworkState(true);
         IronSource.Agent.setMetaData("do_not_sell", "true");
+        IronSource.Agent.setMetaData("is_child_directed", "false");
         IronSource.Agent.setMetaData("AdMob_TFCD", "false");
         IronSource.Agent.setMetaData("AdMob_TFUA", "false");
         IronSource.Agent.setMetaData("AdMob_MaxContentRating", "MAX_AD_CONTENT_RATING_MA");
+        IronSource.Agent.setMetaData("UnityAds_coppa", "false");
         //IronSource.Agent.validateIntegration();
         //IronSource.Agent.setMetaData("is_test_suite", "enable");
 
         LevelPlay.OnInitSuccess += OnInitializationCompleted;
-        LevelPlay.OnInitFailed += error => Debug.LogError("Initialization error: " + error);
+        LevelPlay.OnInitFailed += error => Debug.LogError("Initialization error: " + error.ErrorCode + "\n" + error.ErrorMessage);
 
         LevelPlay.Init(appKey, adFormats: new[] { LevelPlayAdFormat.REWARDED });
     }
@@ -136,7 +134,7 @@ public class LevelPlayManager : MonoBehaviour
         rewardedAd.OnAdDisplayFailed += (adInfo) => Debug.Log($"Video ad failed to display: {adInfo}");
         rewardedAd.OnAdRewarded += (adInfo, reward) => Debug.Log($"Video ad reward: {reward}");
         rewardedAd.OnAdClosed += RewardedAdClosed;
-        
+
         StartCoroutine(LoadRewardedAd());
 
         Debug.Log("Rewarded Ads Initialized");
@@ -182,7 +180,7 @@ public class LevelPlayManager : MonoBehaviour
     {
         Debug.Log($"Video ad closed: {adInfo}");
         StartCoroutine(GameSettings.instance.CoverScreen());
-        
+
         ShowBanner();
         StartCoroutine(LoadRewardedAd());
 

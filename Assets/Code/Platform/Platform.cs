@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEditor.Callbacks;
 using UnityEngine;
 
 public class Platform : MonoBehaviour
@@ -77,22 +78,21 @@ public class Platform : MonoBehaviour
     private IEnumerator PingPongMove(float diff)
     {
         Side side = GetSide();
-        float platformLength = GetComponent<Collider2D>().bounds.size.x;
+        float platformXPos = transform.position.x;
+        float distance = 2;
         float leftRange = 0f;
         float rightRange = 0f;
 
         switch (side)
         {
             case Side.Left:
-                leftRange = Mathf.Max(transform.position.x - platformLength, -xSpawnPosRange);
-                if (leftRange > -6)
-                    rightRange = transform.position.x + platformLength;
+                leftRange = Mathf.Max(platformXPos - distance, -xSpawnPosRange);
+                rightRange = leftRange + (2 * distance);
                 break;
 
             case Side.Right:
-                rightRange = Mathf.Min(transform.position.x + platformLength, xSpawnPosRange);
-                if (rightRange < 6)
-                    leftRange = transform.position.x - platformLength;
+                rightRange = Mathf.Min(platformXPos + distance, xSpawnPosRange);
+                leftRange = rightRange - (2 * distance);
                 break;
         }
 

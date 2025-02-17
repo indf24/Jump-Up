@@ -1,43 +1,74 @@
-Privacy Policy
-This privacy policy applies to the Jump Up app (hereinafter referred to as "Application") for mobile devices, developed by Ruben Ferreira (hereinafter referred to as "Service Provider"). This is an Ad-supported service, provided "AS IS."
+Privacy Policy for Jump Up  
+Last Updated: 2025-02-17  
+Developer: Ruben Ferreira  
+Contact Email: rubenferreira300@gmail.com  
 
-What information does the Application obtain and how is it used?
+This Privacy Policy explains how your data is collected, used, and shared when you use Jump Up (the "App"), a mobile game developed by Ruben Ferreira ("I", "me", or "my"). By using the App, you agree to the practices described below.  
 
-Automatically Collected Information
-The Application may automatically collect certain information, including, but not limited to, the type of mobile device you use, your device’s unique identifiers, IP address, operating system, and information about how you use the Application. This data is primarily collected by third-party services like AdMob to serve ads and improve user experience.
+----------------------------------------  
 
-Does the Application collect precise real-time location information of the device?
-The Application does not collect precise real-time location information. However, AdMob may collect coarse location data based on your device's IP address for ad targeting purposes.
+1. INFORMATION COLLECTED  
+The App itself does not directly collect personal data (e.g., name, email, address). However, third-party advertising and analytics services integrated into the App may automatically collect:  
+- Device Information: Device type, OS version, unique identifiers (e.g., Advertising ID), and IP address.  
+- Usage Data: Session length, gameplay interactions, and ad engagement.  
+- Approximate Location: Coarse location inferred from your IP address (used for ad targeting).  
 
-Do third parties see and/or have access to information obtained by the Application?
-The Application uses third-party services, such as AdMob, which may collect, use, and share data as described in their privacy policies. Only aggregated and anonymized data is transmitted to third-party services for improving the Application.
+----------------------------------------  
 
-The Service Provider may disclose User Provided and Automatically Collected Information:
-    As required by law (e.g., to comply with a subpoena or similar legal process);
-    When the Service Provider believes disclosure is necessary to protect their rights, safety, or to respond to government requests;
-    With trusted service providers who operate on behalf of the Service Provider, under strict terms to protect your data.
-For more information on how AdMob handles your data, refer to their privacy policy: AdMob Privacy Policy
+2. THIRD-PARTY SERVICES  
+The App uses the following services for ads and analytics:  
+- IronSource (Privacy Policy: https://www.is.com/privacy-policy/)  
+- UnityAds (Privacy Policy: https://unity.com/legal/privacy-policy)  
+- Google AdMob (Privacy Policy: https://policies.google.com/privacy)  
 
-Opt-Out Rights
-Users can opt out of personalized advertising through the AdMob consent form within the Application or by adjusting their ad preferences in their Google account settings.
+These services may collect data to:  
+- Serve personalized or non-personalized ads.  
+- Measure ad performance and prevent fraud.  
+- Analyze gameplay trends to improve the App.  
 
-Data Retention Policy, Managing Your Information
-The Service Provider will retain any collected data for as long as you use the Application. Data collected by AdMob is managed by Google in accordance with their privacy policies.
-If you'd like to delete any data you’ve provided, please contact us at rubenferreira300@gmail.com.
+----------------------------------------  
 
-Children
-The Application does not knowingly collect personal information from children under 13. If you are a parent or guardian and you believe your child has provided us with personal information, please contact us so that we can take the necessary actions.
+3. CONSENT AND COMPLIANCE  
 
-Security
-The Service Provider takes precautions to safeguard the confidentiality of your information. However, no security system is completely foolproof. We strive to protect your information but cannot guarantee absolute security.
+GDPR (European Users):  
+If you are in the European Economic Area (EEA), the App uses Google’s User Messaging Platform (UMP) to request your consent for personalized ads. You may:  
+- Withdraw consent via device settings or the App’s consent form.  
+- Request data deletion by contacting third-party providers directly.  
 
-Changes
-This Privacy Policy may be updated occasionally. The Service Provider will notify you of any changes by updating this page. Please review this Privacy Policy regularly. Continued use of the Application signifies acceptance of any changes.
+CCPA (California Users):  
+Under the California Consumer Privacy Act (CCPA):  
+- The App signals "do not sell" requests to ad partners.  
+- Opt out of personalized ads via Google account settings or the UMP consent form.  
 
-This privacy policy is effective as of 2025-01-19.
+COPPA (Children’s Privacy):  
+The App is intended for a general audience and is not specifically directed at children under 13. However, we recognize that children may access the App. To comply with the Children’s Online Privacy Protection Act (COPPA):  
+- We do not knowingly collect personal information from users under 13.  
+- If you are a parent or guardian and believe your child has provided personal information, please contact us at rubenferreira300@gmail.com so we can promptly delete it.  
+- We work with third-party ad networks (e.g., IronSource, UnityAds, AdMob) to ensure compliance with COPPA, including serving non-personalized ads to users under 13.  
 
-Your Consent
-By using the Application, you consent to the processing of your information as described in this Privacy Policy.
+----------------------------------------  
 
-Contact Us
-For any questions about privacy while using the Application, or regarding this Privacy Policy, please contact us at rubenferreira300@gmail.com.
+4. DATA RETENTION  
+- Data collected by third parties is retained according to their policies (see links above).  
+- I retain aggregated, anonymized data only for App improvement.  
+
+----------------------------------------  
+
+5. YOUR RIGHTS  
+- Opt Out of Personalized Ads: Use the consent form in the App or adjust preferences in your device settings (e.g., reset Advertising ID on Android).  
+- Delete Data: Contact third-party providers directly or email me at rubenferreira300@gmail.com for assistance.  
+
+----------------------------------------  
+
+6. SECURITY  
+I implement industry-standard measures to protect your data. However, no method of electronic transmission is 100% secure.  
+
+----------------------------------------  
+
+7. CHANGES TO THIS POLICY  
+Updates will be posted here. Continued use of the App after changes constitutes acceptance.  
+
+----------------------------------------  
+
+8. CONTACT ME  
+For questions or requests, email: rubenferreira300@gmail.com 
